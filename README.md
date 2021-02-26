@@ -1,1 +1,2 @@
 # MyHouseHoldApp
+Simple Angular project
