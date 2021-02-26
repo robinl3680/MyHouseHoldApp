@@ -1,0 +1,10 @@
+<ul class="list-group">
+    <li class="list-group-item"
+     *ngFor="let item of detailedViewData"
+     [value]="item">
+        <h4 style="color: rgb(51, 153, 255)">Category: {{item.item}}</h4>
+        <h5 style="color: rgb(153, 204, 255)">Date of purchase: {{item.date}}</h5>
+        <h5 style="color: rgb(255, 80, 80)">Amount costed: {{item.amount}}</h5>
+        <h4 style="color: rgb(153, 204, 0)">Name of Person: {{item.person}}</h4>
+    </li>
+</ul>

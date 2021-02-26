@@ -1,0 +1,34 @@
+<div class="container">
+    <div class="row" *ngIf="chartMode === ''">
+        <div class="col col-md-12 text-center">
+            <div class="alert alert-info">
+                <h4 style="margin-top: 10px;">Please click on chart to get detailed view!!</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div [class]="chartMode === '' ? 'col col-md-6' : 'col col-md-4'">
+            <canvas [height]="200" baseChart
+            [data]="itemChartData"
+            [labels]="itemChartLabels"
+            [chartType]="pieChartType"
+            [options]="itemChartOptions"
+            [colors]="pieChartColors">
+            </canvas>
+        </div>
+        <div [class]="chartMode === '' ? 'col col-md-6' : 'col col-md-4'">
+            <canvas [height]="200" baseChart
+            [title]="'Cost analysis'"
+            [data]="personChartData"
+            [labels]="personChartLabels"
+            [chartType]="pieChartType"
+            [colors]="pieChartColors"
+            [options]="personChartOptions">
+            </canvas>
+        </div>
+        <div [class]="chartMode === '' ? 'col col-md-0' : 'col col-md-4'">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+    
+</div>

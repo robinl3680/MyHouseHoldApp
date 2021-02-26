@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="row">
+      <div class="col col-md-12">
+        <app-filter-component></app-filter-component>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+          <div class="alert alert-info" *ngIf="fetChMode && !error">
+            <app-loading-spinner></app-loading-spinner>Loading...
+          </div>
+          <h4 class="alert alert-danger" *ngIf="retrievedItems.length < 1 && !fetChMode">{{error ? error : 'No items are available!!'}}</h4>
+          <div *ngIf="retrievedItems.length > 0">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let item of sortedList(); let i = index;">
+                <div style="cursor: pointer;" (click)="onClickItem(i)">
+                    <h4>Category: {{item.item}}</h4>
+                    <h5>Date of purchase: {{item.date}}</h5>
+                    <h5>Amount costed: {{item.amount}}</h5>
+                    <h4>Name of Person: {{item.person}}</h4>
+                </div>
+                <div class="btn-toolbar">
+                  <button type="button" 
+                    class="btn btn-danger"
+                    (click)="onDeleteData(item.key)">Delete this entry</button>
+                    <button type="button" 
+                    class="btn btn-primary" (click)="onModifyEntry(item.key)">Modify this entry</button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <router-outlet></router-outlet>    
+</div>
