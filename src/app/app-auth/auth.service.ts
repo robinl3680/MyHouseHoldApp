@@ -78,7 +78,7 @@ export class AuthService {
 
     private deleteUserOnNotVerifying(tokenId: string) {
         const M_SEC = 1000;
-        const ONE_HOUR = 120;
+        const ONE_HOUR = 3600;
         this.autoDeleteInterval = setTimeout(() => {
             this.getUserData(tokenId, true);
         }, ONE_HOUR * M_SEC);
