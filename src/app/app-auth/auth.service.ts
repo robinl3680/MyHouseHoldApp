@@ -92,7 +92,9 @@ export class AuthService {
             })
             .pipe(catchError((errorResponse) => {
                 return this.handleError(errorResponse, this.errorSub);
-            })).subscribe();
+            })).subscribe((data) => {
+                this.errorSub.next('User is not registered as not verifying the mail, please signup again');
+            });
         }
     }
 
