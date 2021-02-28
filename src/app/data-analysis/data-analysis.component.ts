@@ -27,11 +27,11 @@ export class DataAnalysisComponent implements OnInit {
   public pieChartType = 'doughnut';
   public itemChartOptions = {
     'onClick' : this.handleOnClickLegendForItemChart.bind(this),
-    cutoutPercentage: 40
+    cutoutPercentage: 0
   };
   public personChartOptions = {
     'onClick': this.handleOnClickLegendForPersonChart.bind(this),
-    cutoutPercentage: 40
+    cutoutPercentage: 0
   };
   public backgroundColor = ['rgba(0, 0, 225, 1)', 'rgba(255, 0, 0, 1)', 'rgba(51, 204, 0, 1)', 'rgba(204, 0, 204, 1)', 'rgba(255, 153, 0, 1)', 'rgba(255, 0, 102, 1)'];
   private itemDetails: ItemDetails[] = [];
