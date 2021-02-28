@@ -5,7 +5,6 @@ import { throwError, pipe, BehaviorSubject, Subject } from 'rxjs';
 import { UserModel } from './user.model';
 import { Router } from '@angular/router';
 import { StatusCodes } from 'http-status-codes';
-import { AngularFireAuth } from '@angular/fire/auth'
 
 export interface AuthResponse {
     idToken: string,
@@ -30,12 +29,14 @@ export class AuthService {
     currentExpireTime: number;
 
     constructor(private http: HttpClient,
-        private router: Router,
-        private fireAuth: AngularFireAuth) {
+        private router: Router) {
 
     }
     public handleError(errorResponse?: HttpErrorResponse, errorSubj?: Subject<string>) {
-        let errorMessage = "An unknown error occured!!";
+        let errorMessage = "An unknown error occured please try after sometime!!";
+        if(errorSubj) {
+            errorSubj.next(errorMessage);
+        }
         if(typeof(errorResponse) === 'string') {
             return throwError(errorResponse);
         }
@@ -55,9 +56,6 @@ export class AuthService {
         }
         if(errorResponse.status === StatusCodes.UNAUTHORIZED) {
             errorMessage = "You're aunauthorized to access this page, please login!!"
-        }
-        if(errorSubj) {
-            errorSubj.next(errorMessage);
         }
         return throwError(errorMessage);
     }

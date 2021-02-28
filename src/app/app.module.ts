@@ -17,19 +17,6 @@ import { TooltipModule } from 'ng2-tooltip-directive';
 import { DataAnalysisComponent } from './data-analysis/data-analysis.component';
 import { ChartsModule } from 'ng2-charts';
 import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/detailed-data-view.component';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireAuthModule } from '@angular/fire/auth';
-
-const config = {
-    apiKey: "AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI",
-    authDomain: "householdapp-7db63.firebaseapp.com",
-    databaseURL: "https://householdapp-7db63-default-rtdb.firebaseio.com",
-    projectId: "householdapp-7db63",
-    storageBucket: "householdapp-7db63.appspot.com",
-    messagingSenderId: "960069261796",
-    appId: "1:960069261796:web:bc0c061f95f95478928ff1",
-    measurementId: "G-HCC7VFJZG5"
-};
 
 @NgModule({
   declarations: [
@@ -51,10 +38,7 @@ const config = {
     AppRoutingModule,
     BrowserAnimationsModule,
     TooltipModule,
-    ChartsModule,
-    AngularFireModule.initializeApp(config),
-    AngularFireAuthModule
-
+    ChartsModule
   ],
   providers: [{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]
