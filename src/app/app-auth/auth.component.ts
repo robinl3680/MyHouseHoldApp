@@ -24,6 +24,7 @@ export class AuthComponent implements OnInit {
         this.authService.errorSub.subscribe((error) => {
             this.error = error;
             this.isLoading = false;
+            this.alert = null;
         });
     }
 
@@ -37,9 +38,11 @@ export class AuthComponent implements OnInit {
             this.authService.login(email, password);
         } else {
             this.authService.signUp(email, password);
-            this.alert = "You're successfully registered, verify your mail and proceed to login!!";
-            form.reset();
-            this.isLoading = false;
+            this.authService.emailVerifyAlert.subscribe((alert) => {
+                this.alert = alert;
+                form.reset();
+                this.isLoading = false;
+            });
             this.onSwitchMode();
         }
 

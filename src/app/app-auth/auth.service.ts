@@ -25,8 +25,11 @@ export class AuthService {
 
 
     public verifiedUser = new Subject<boolean>();
+    public emailVerifyAlert = new Subject<string>();
     currentUser: UserModel;
     currentExpireTime: number;
+    isUserVerified = false;
+    private autoDeleteInterval;
 
     constructor(private http: HttpClient,
         private router: Router) {
@@ -34,15 +37,22 @@ export class AuthService {
     }
     public handleError(errorResponse?: HttpErrorResponse, errorSubj?: Subject<string>) {
         let errorMessage = "An unknown error occured please try after sometime!!";
+
+        if(typeof(errorResponse) === 'string') {
+            if(errorSubj) {
+                errorSubj.next(errorResponse);
+            }
+            return throwError(errorResponse);
+        }
+
         if(errorSubj) {
             errorSubj.next(errorMessage);
         }
-        if(typeof(errorResponse) === 'string') {
-            return throwError(errorResponse);
-        }
+
         if( !errorResponse || !errorResponse.error || !errorResponse.error.error) {
             return throwError(errorMessage);
         }
+        
         switch(errorResponse.error.error.message) {
             case 'EMAIL_EXISTS':
                 errorMessage = 'This mail id already exists, please try to login!!';
@@ -62,7 +72,28 @@ export class AuthService {
 
     private handleSignUp(responseData: AuthResponse) {
         this.verifyEmail(responseData.email, responseData.idToken);
+        this.deleteUserOnNotVerifying(responseData.idToken);
         //this.handleAuthentication(responseData);
+    }
+
+    private deleteUserOnNotVerifying(tokenId: string) {
+        const M_SEC = 1000;
+        const ONE_HOUR = 120;
+        this.autoDeleteInterval = setTimeout(() => {
+            this.getUserData(tokenId, true);
+        }, ONE_HOUR * M_SEC);
+    }
+
+    private deleteUser(tokenId: string, userData) {
+        if(!userData.users[0].emailVerified) {
+            this.http.post('https://identitytoolkit.googleapis.com/v1/accounts:delete?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
+            {
+                idToken: tokenId
+            })
+            .pipe(catchError((errorResponse) => {
+                return this.handleError(errorResponse, this.errorSub);
+            })).subscribe();
+        }
     }
 
     private onUserDataRecieved(response) {
@@ -71,12 +102,13 @@ export class AuthService {
             localStorage.setItem('userData', JSON.stringify(this.currentUser));
             this.autoLogOut(this.currentExpireTime);
             this.user.next(this.currentUser);
+            clearInterval(this.autoDeleteInterval);
         } else {
             this.verifiedUser.next(false);
         }
     }
 
-    private getUserData(responseData: AuthResponse, tokenId: string) {
+    private getUserData(tokenId: string, checkForDelete: boolean = false) {
         this.http.post('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
         {
             idToken: tokenId
@@ -84,7 +116,13 @@ export class AuthService {
         .pipe(catchError((errorResponse) => {
             return this.handleError(errorResponse, this.errorSub);
         }),
-        tap(this.onUserDataRecieved.bind(this))).subscribe();
+        tap((userData) => {
+            if(checkForDelete) {
+                this.deleteUser(tokenId, userData);
+            } else {
+                this.onUserDataRecieved(userData);
+            }
+        })).subscribe();
     }
 
 
@@ -101,7 +139,7 @@ export class AuthService {
         
         this.currentUser = user;
         this.currentExpireTime = (+responseData.expiresIn) * 1000;
-        this.getUserData(responseData, responseData.idToken);
+        this.getUserData(responseData.idToken);
 
     }
 
@@ -128,6 +166,7 @@ export class AuthService {
             return this.handleError(errResponse, this.errorSub);
         }),tap((response) => {
             console.log(response);
+            this.emailVerifyAlert.next('Successfully sent a mail to verify your accout, please verify and login!!');
         })).subscribe();
     }
 
