@@ -9,31 +9,27 @@
         <div *ngIf="isLoading" style="text-align: center;">
             <app-loading-spinner></app-loading-spinner>Loading...
         </div>
-        <form #form="ngForm" (ngSubmit)="onSubmit(form)" *ngIf="!isLoading">
-            <div class="form-group">
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)" *ngIf="!isLoading && !loginWithPhone">
+            <div class="form-group" >
                 <label for="email">Email</label>
-                <input type="text"
-                class="form-control"
-                id="email"
-                name="email"
-                required
-                email
-                ngModel>
+                <input type="text" class="form-control" id="email" name="email" required email ngModel>
             </div>
-            <div class="form-group">
+            <div class="form-group" *ngIf="!isForgotPassword">
                 <label for="password">Password</label>
-                <input type="password"
-                class="form-control"
-                id="password"
-                name="password"
-                required
-                minlength="6"
-                ngModel>
+                <input type="password" class="form-control" id="password" name="password" required minlength="6"
+                    ngModel>
+                    
             </div>
-            <div class="btn-toolbar">
-                <button class="btn btn-primary" type="submit" [disabled]="form.invalid">{{ isLoginMode ? 'Login' : 'Sign up' }}</button>
-                <button class="btn btn-primary" type="button" (click)="onSwitchMode()">Switch to {{ isLoginMode? 'Sign up' : 'Login' }}</button>
+           
+            <div *ngIf="isLoginMode">
+                <a class="reset" (click)="resetPassword()">Forget Password</a>
             </div>
+
+            <div class="btn-toolbar" >
+                <button class="btn btn-primary" type="submit" [disabled]="form.invalid">{{ isLoginMode ? 'Login' : (isForgotPassword ? 'Submit' : 'Sign Up') }}</button>
+                <button *ngIf="!isForgotPassword" class="btn btn-primary" type="button" (click)="onSwitchMode()">Switch to {{ isLoginMode? 'Sign up' : 'Login' }}</button>
+            </div>
+           
         </form>
     </div>
 </div>

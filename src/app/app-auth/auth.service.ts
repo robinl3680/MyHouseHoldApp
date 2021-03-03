@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError, pipe, BehaviorSubject, Subject } from 'rxjs';
+import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { UserModel } from './user.model';
 import { Router } from '@angular/router';
 import { StatusCodes } from 'http-status-codes';
@@ -18,7 +18,6 @@ export interface AuthResponse {
     providedIn: 'root'
 })
 export class AuthService {
-
     user = new BehaviorSubject<UserModel>(null);
     private autoLogOutInterval;
     public errorSub = new Subject<string>();
@@ -69,6 +68,14 @@ export class AuthService {
         }
         return throwError(errorMessage);
     }
+     
+    get windowRef(){
+        return window;
+    }
+
+    loginWithPhone(phoneNumber:number){
+      return;
+    }
 
     private handleSignUp(responseData: AuthResponse) {
         this.verifyEmail(responseData.email, responseData.idToken);
@@ -78,7 +85,7 @@ export class AuthService {
 
     private deleteUserOnNotVerifying(tokenId: string) {
         const M_SEC = 1000;
-        const ONE_HOUR = 3600;
+        const ONE_HOUR = 120;
         this.autoDeleteInterval = setTimeout(() => {
             this.getUserData(tokenId, true);
         }, ONE_HOUR * M_SEC);
@@ -172,6 +179,18 @@ export class AuthService {
         })).subscribe();
     }
 
+    resetPasswordOfUsers(email:string){
+        this.http.post('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',{
+            "requestType":"PASSWORD_RESET",
+            "email":email
+        }).pipe(catchError((errResponse)=>{
+            return this.handleError(errResponse, this.errorSub);
+        }),tap((response)=>{
+            console.log(response);
+            this.emailVerifyAlert.next('Successfully sent a reset password link to your mail id, please give reset your password!');
+        })).subscribe();
+    }
+
     login(email: string, password: string) {
         
         // this.fireAuth.signInWithEmailAndPassword(email, password).then(response => {
@@ -191,6 +210,10 @@ export class AuthService {
         tap(this.handleAuthentication.bind(this))).subscribe();
         
     }
+
+    // loginWithPhone(phoneNumber:number){
+    //    return this.http.post<AuthResponse>('http://localhost:9099/emulator/v1/projects/{project-id}/verificationCodes')
+    // }
 
     autoLogin() {
         const userData: {
