@@ -22,31 +22,27 @@
           <div class="form-group">
             <div class="row">
               <div class="col-md-2">
-                <label for="item">Purchase Details</label>
+                <label for="item">Select item</label>
               </div>
               <div class="col-md-5">
-                <input class="form-control" type="text"
-                 name="item"
-                 ngModel
-                 required
-                 (ngModelChange)="onModelChange()">
-              </div>
-              </div>
-              </div>
-              
-              <!-- <div class="form-group">
-                                        <div class="row">
-                                          <div class="col-md-2">
-                                            <label for="item">Select item</label>
-                                          </div>
-                                          <div class="col-md-5">
-                                            <select class="form-control" name="item" ngModel="Vegetables" required (ngModelChange)="onModelChange()">
-                                              <option *ngFor="let item of itemCategories" [value]="item">{{item}}</option>
+                <select class="form-control" name="item" ngModel="Vegetables" required (ngModelChange)="onModelChangeItemCombo(form)">
+                  <option *ngFor="let item of itemCategories" [value]="item">{{item}}</option>
                 </select>
               </div>
             </div>
-          </div> -->
-
+          </div>
+          
+          <div class="form-group" *ngIf="itemType === 'Others'">
+            <div class="row">
+              <div class="col-md-2">
+                <label for="detailed-data">Purchase Details</label>
+              </div>
+              <div class="col-md-5">
+                <input class="form-control" type="text" name="detailed-data" ngModel required (ngModelChange)="onModelChange()">
+              </div>
+            </div>
+          </div>
+            
           <div class="form-group">
            <div class="row">
              <div class="col-md-2">

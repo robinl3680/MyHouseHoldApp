@@ -21,6 +21,7 @@ export class PurchaseFormComponent implements OnInit {
   enableClear = true;
   error: string;
   id: string;
+  itemType: string;
   @ViewChild('form') form: NgForm;
 
   constructor(private itemService: ItemsService, 
@@ -33,10 +34,10 @@ export class PurchaseFormComponent implements OnInit {
 
   ngOnInit() {
 
-    // this.itemService.accessItems()
-    // .subscribe((items) => {
-    //   this.itemCategories = items;
-    // });
+    this.itemService.accessItems()
+      .subscribe((items) => {
+        this.itemCategories = items;
+      });
 
     this.personService.fetchPersonDetails()
     .subscribe((persons: Person[]) => {
@@ -97,6 +98,12 @@ export class PurchaseFormComponent implements OnInit {
   onModelChange() {
     this.isSuccess = false;
     this.enableClear = true;
+  };
+
+  onModelChangeItemCombo() {
+    this.isSuccess = false;
+    this.enableClear = true;
+    this.itemType = this.form.value['item'];
   };
 
   resetForm(isClear?: boolean) {

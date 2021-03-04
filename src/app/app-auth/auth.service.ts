@@ -68,14 +68,6 @@ export class AuthService {
         }
         return throwError(errorMessage);
     }
-     
-    get windowRef(){
-        return window;
-    }
-
-    loginWithPhone(phoneNumber:number){
-      return;
-    }
 
     private handleSignUp(responseData: AuthResponse) {
         this.verifyEmail(responseData.email, responseData.idToken);
