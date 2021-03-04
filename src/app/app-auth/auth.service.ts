@@ -136,20 +136,11 @@ export class AuthService {
 
 
     private handleAuthentication(responseData: AuthResponse) {
-        
-        console.log(responseData);
         const expireDate = new Date(new Date().getTime() + (+responseData.expiresIn) * 1000);
         const user = new UserModel(responseData.email, responseData.localId, responseData.idToken, expireDate);
-        
-        
-        // localStorage.setItem('userData', JSON.stringify(user));
-        // this.autoLogOut((+responseData.expiresIn) * 1000);
-        // this.user.next(user);
-        
         this.currentUser = user;
         this.currentExpireTime = (+responseData.expiresIn) * 1000;
         this.getUserData(responseData.idToken);
-
     }
 
     signUp(email: string, password: string) {
@@ -173,8 +164,7 @@ export class AuthService {
             "idToken": idToken
         }).pipe(catchError((errResponse) => {
             return this.handleError(errResponse, this.errorSub);
-        }),tap((response) => {
-            console.log(response);
+        }), tap((response) => {
             this.emailVerifyAlert.next('Successfully sent a mail to verify your accout, please verify and login!!');
         })).subscribe();
     }
@@ -185,18 +175,12 @@ export class AuthService {
             "email":email
         }).pipe(catchError((errResponse)=>{
             return this.handleError(errResponse, this.errorSub);
-        }),tap((response)=>{
-            console.log(response);
+        }), tap((response) => {
             this.emailVerifyAlert.next('Successfully sent a reset password link to your mail id, please give reset your password!');
         })).subscribe();
     }
 
     login(email: string, password: string) {
-        
-        // this.fireAuth.signInWithEmailAndPassword(email, password).then(response => {
-        //     console.log(response);
-        // });
-
 
         this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
         {
@@ -210,10 +194,6 @@ export class AuthService {
         tap(this.handleAuthentication.bind(this))).subscribe();
         
     }
-
-    // loginWithPhone(phoneNumber:number){
-    //    return this.http.post<AuthResponse>('http://localhost:9099/emulator/v1/projects/{project-id}/verificationCodes')
-    // }
 
     autoLogin() {
         const userData: {

@@ -13,16 +13,10 @@ export class AuthComponent implements OnInit {
     isLoading = false;
     error: string = null;
     alert: string;
-    isForgotPassword=false;
-    hideAll=true;
-    phoneNumber: number;
-    loginWithPhone = false;
-    otp: number;
-    windowRef;
+    isForgotPassword = false;
 
     constructor(private authService: AuthService,
         private router: Router) {
-        this.windowRef = this.authService.windowRef;
     }
 
     ngOnInit() {
@@ -39,7 +33,6 @@ export class AuthComponent implements OnInit {
         const password = form.value.password;
        
         this.isLoading = true;
-        let authObs: Observable<AuthResponse>;
 
         if(this.isLoginMode) {
             this.authService.login(email, password);
@@ -73,35 +66,22 @@ export class AuthComponent implements OnInit {
                 this.error = "Please verify your email!!"
             }
         });
-
-
-        // if(this.isLoginMode) {
-        //     authObs = this.authService.login(email, password).subscribe(());
-        // } else {
-        //     authObs = this.authService.signUp(email, password);
-        // }
-        // authObs.subscribe((resPonse)=>{
-        //         this.isLoading = false;
-        //         this.router.navigate(['/purchase-form']);
-        //     }, errorMessage => {
-        //         this.isLoading = false;
-        //         this.error = errorMessage;
-        // });
     }
 
     resetPassword(){
-      this.isForgotPassword=true;
-      this.isLoginMode=false;
-      this.isLoading=false;
+        this.isForgotPassword = true;
+        this.isLoginMode = false;
+        this.isLoading = false;
     }
 
     onSwitchMode() {
-        this.isLoginMode = !this.isLoginMode;
-        this.error = null;
+        if (!this.isForgotPassword) {
+            this.isLoginMode = !this.isLoginMode;
+            this.error = null;
+        } else {
+            this.isLoginMode = true;
+            this.isForgotPassword = !this.isForgotPassword;
+        }
     }
 
-    signInWithPhone() {
-        this.loginWithPhone = !this.loginWithPhone;
-        this.isForgotPassword=false;
-    }
 }

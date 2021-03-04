@@ -9,7 +9,7 @@
         <div *ngIf="isLoading" style="text-align: center;">
             <app-loading-spinner></app-loading-spinner>Loading...
         </div>
-        <form #form="ngForm" (ngSubmit)="onSubmit(form)" *ngIf="!isLoading && !loginWithPhone">
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)" *ngIf="!isLoading">
             <div class="form-group" >
                 <label for="email">Email</label>
                 <input type="text" class="form-control" id="email" name="email" required email ngModel>
@@ -21,13 +21,14 @@
                     
             </div>
            
-            <div *ngIf="isLoginMode">
-                <a class="reset" (click)="resetPassword()">Forget Password</a>
+            <div *ngIf="isLoginMode" style="margin-bottom: 10px;">
+                <a class="reset" (click)="resetPassword()">Forgot Password?</a>
             </div>
 
             <div class="btn-toolbar" >
                 <button class="btn btn-primary" type="submit" [disabled]="form.invalid">{{ isLoginMode ? 'Login' : (isForgotPassword ? 'Submit' : 'Sign Up') }}</button>
-                <button *ngIf="!isForgotPassword" class="btn btn-primary" type="button" (click)="onSwitchMode()">Switch to {{ isLoginMode? 'Sign up' : 'Login' }}</button>
+                <button class="btn btn-primary" type="button" (click)="onSwitchMode()"> {{ isForgotPassword ? 'Cancel' : 'Switch to' + (
+                    isLoginMode ? 'Sign up' : 'Login' ) }}</button>
             </div>
            
         </form>

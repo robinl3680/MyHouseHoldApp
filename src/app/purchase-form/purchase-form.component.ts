@@ -32,10 +32,12 @@ export class PurchaseFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.itemService.accessItems()
-    .subscribe((items) => {
-      this.itemCategories = items;
-    });
+
+    // this.itemService.accessItems()
+    // .subscribe((items) => {
+    //   this.itemCategories = items;
+    // });
+
     this.personService.fetchPersonDetails()
     .subscribe((persons: Person[]) => {
       this.persons = persons;
