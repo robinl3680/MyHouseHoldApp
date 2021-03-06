@@ -31,9 +31,8 @@ export class AuthService {
     private autoDeleteInterval;
 
     constructor(private http: HttpClient,
-        private router: Router) {
+        private router: Router) { }
 
-    }
     public handleError(errorResponse?: HttpErrorResponse, errorSubj?: Subject<string>) {
         let errorMessage = "An unknown error occured please try after sometime!!";
 

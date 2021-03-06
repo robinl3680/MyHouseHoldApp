@@ -10,9 +10,11 @@ import { AppResolver } from './app-resolver.service';
 import { DataAnalysisComponent } from './data-analysis/data-analysis.component';
 import { AuthService } from './app-auth/auth.service';
 import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/detailed-data-view.component';
+import { PasswordlessAuthComponent } from "./app-auth/phone-login.component";
 
 const routes: Routes = [
     { path: '', redirectTo: 'auth', pathMatch: 'full' },
+    { path: 'phone-auth', component:PasswordlessAuthComponent},
     { path: 'purchase-form', component: PurchaseFormComponent, canActivate: [AuthGuard] },
     { path: 'purchase-details', component: PurchaseDetailsComponent, resolve: [AppResolver], canActivate: [AuthGuard],
       children: [

@@ -3,6 +3,9 @@
         <ul class="nav navbar-nav">
             <li [routerLinkActive]="'active'" *ngIf="!isAuthenticated">
                 <a routerLink="auth">Authenticate</a>
+            </li>.
+            <li [routerLinkActive]="'active'" *ngIf="!isAuthenticated">
+                <a routerLink="phone-auth">Phone Authenticate</a>
             </li>
             <li [routerLinkActive]="'active'" *ngIf="isAuthenticated">
                 <a  [routerLink]="['purchase-form']">Purchase Form</a>

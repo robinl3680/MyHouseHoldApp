@@ -9,8 +9,8 @@
         <div *ngIf="isLoading" style="text-align: center;">
             <app-loading-spinner></app-loading-spinner>Loading...
         </div>
-        <form #form="ngForm" (ngSubmit)="onSubmit(form)" *ngIf="!isLoading">
-            <div class="form-group" >
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)" *ngIf="!isLoading && !loginWithPhone">
+            <div class="form-group">
                 <label for="email">Email</label>
                 <input type="text" class="form-control" id="email" name="email" required email ngModel>
             </div>
@@ -32,5 +32,10 @@
             </div>
            
         </form>
+        <div class="btn-toolbar" style="padding-top: 10px;">
+            <button class="btn btn-primary" style="align-items: center;" (click)="signInWithPhone()" type="button" >Login with Phone</button>
+             <app-phone-login-auth *ngIf="loginWithPhone"></app-phone-login-auth> 
+        </div>
     </div>
+            
 </div>

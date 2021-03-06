@@ -17,7 +17,11 @@ import { TooltipModule } from 'ng2-tooltip-directive';
 import { DataAnalysisComponent } from './data-analysis/data-analysis.component';
 import { ChartsModule } from 'ng2-charts';
 import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/detailed-data-view.component';
+import { PasswordlessAuthComponent } from './app-auth/phone-login.component';
+import { AngularFireModule  } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 
+const firebaseConfig = {};
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,7 +33,8 @@ import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/de
     AuthComponent,
     FilterComponent,
     DataAnalysisComponent,
-    DetailedDataViewComponent
+    DetailedDataViewComponent,
+    PasswordlessAuthComponent
   ],
   imports: [
     BrowserModule, 
@@ -38,7 +43,9 @@ import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/de
     AppRoutingModule,
     BrowserAnimationsModule,
     TooltipModule,
-    ChartsModule
+    ChartsModule,
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireAuthModule
   ],
   providers: [{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]
