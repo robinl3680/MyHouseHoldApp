@@ -5,6 +5,8 @@ import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { UserModel } from './user.model';
 import { Router } from '@angular/router';
 import { StatusCodes } from 'http-status-codes';
+import { PhoneUserModel } from './phone-user-model';
+import { stringify } from '@angular/compiler/src/util';
 
 export interface AuthResponse {
     idToken: string,
@@ -18,10 +20,9 @@ export interface AuthResponse {
     providedIn: 'root'
 })
 export class AuthService {
-    user = new BehaviorSubject<UserModel>(null);
+    user = new BehaviorSubject<UserModel | PhoneUserModel>(null);
     private autoLogOutInterval;
     public errorSub = new Subject<string>();
-
 
     public verifiedUser = new Subject<boolean>();
     public emailVerifyAlert = new Subject<string>();
@@ -124,6 +125,10 @@ export class AuthService {
                 this.onUserDataRecieved(userData);
             }
         })).subscribe();
+    }
+
+    handlePhoneUser(phone: string, token: string) {
+        this.user.next(new PhoneUserModel(phone, token));
     }
 
 
