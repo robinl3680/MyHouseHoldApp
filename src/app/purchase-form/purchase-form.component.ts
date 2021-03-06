@@ -7,6 +7,7 @@ import { PurchaseDetailsService } from '../purchase-details.service';
 import { StatusCodes } from 'http-status-codes';
 import { ActivatedRoute, Data } from '@angular/router';
 import { AuthService } from '../app-auth/auth.service';
+import { ItemDetails } from '../items.model';
 
 @Component({
   selector: 'app-purchase-form',
@@ -22,6 +23,7 @@ export class PurchaseFormComponent implements OnInit {
   error: string;
   id: string;
   itemType: string;
+  formData: ItemDetails;
   @ViewChild('form') form: NgForm;
 
   constructor(private itemService: ItemsService, 
@@ -45,15 +47,19 @@ export class PurchaseFormComponent implements OnInit {
     });
     this.route.params.subscribe((data: Data)=> {
       this.id = data['id'];
+      this.formData = this.purchaseService.onModifyEntry(this.id);
+      if (this.formData) {
+        this.itemType = this.formData.item;
+      }
     });
-    if(this.id) {
+
+    if (this.id) {
       setTimeout(() => {
-          const formData = this.purchaseService.onModifyEntry(this.id);
-          if(formData) {
-            this.form.setValue(formData);
-          } else {
-            this.error = "Data can't be loaded!!";
-          }
+        if (this.formData) {
+          this.form.setValue(this.formData);
+        } else {
+          this.error = "Data can't be loaded!!";
+        }
       });
     }
     this.authService.errorSub.subscribe((errorMessage)=>{
@@ -103,7 +109,9 @@ export class PurchaseFormComponent implements OnInit {
   onModelChangeItemCombo() {
     this.isSuccess = false;
     this.enableClear = true;
-    this.itemType = this.form.value['item'];
+    if (!this.id) {
+      this.itemType = this.form.value['item'];
+    }
   };
 
   resetForm(isClear?: boolean) {
