@@ -84,4 +84,8 @@ export class AuthComponent implements OnInit {
         }
     }
 
+    validatePassword(form: NgForm) {
+        console.log(form);
+    }
+
 }

@@ -17,6 +17,8 @@ import { TooltipModule } from 'ng2-tooltip-directive';
 import { DataAnalysisComponent } from './data-analysis/data-analysis.component';
 import { ChartsModule } from 'ng2-charts';
 import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/detailed-data-view.component';
+import { PasswordLengthValidator } from './shared/password-validator';
+import { PasswordMisMatchValidator } from './shared/password-mismatch-validator';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,9 @@ import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/de
     AuthComponent,
     FilterComponent,
     DataAnalysisComponent,
-    DetailedDataViewComponent
+    DetailedDataViewComponent,
+    PasswordLengthValidator,
+    PasswordMisMatchValidator
   ],
   imports: [
     BrowserModule, 
