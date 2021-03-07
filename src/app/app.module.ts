@@ -20,6 +20,8 @@ import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/de
 import { PasswordlessAuthComponent } from './app-auth/phone-login.component';
 import { AngularFireModule  } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
+import { PasswordLengthValidator } from './shared/password-validator';
+import { PasswordMisMatchValidator } from './shared/password-mismatch-validator';
 
 const firebaseConfig = {};
 @NgModule({
@@ -34,7 +36,9 @@ const firebaseConfig = {};
     FilterComponent,
     DataAnalysisComponent,
     DetailedDataViewComponent,
-    PasswordlessAuthComponent
+    PasswordlessAuthComponent,
+    PasswordLengthValidator,
+    PasswordMisMatchValidator
   ],
   imports: [
     BrowserModule, 

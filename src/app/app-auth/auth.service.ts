@@ -6,8 +6,6 @@ import { UserModel } from './user.model';
 import { Router } from '@angular/router';
 import { StatusCodes } from 'http-status-codes';
 import { PhoneUserModel } from './phone-user-model';
-import { stringify } from '@angular/compiler/src/util';
-
 export interface AuthResponse {
     idToken: string,
     email: string,
@@ -36,22 +34,18 @@ export class AuthService {
 
     public handleError(errorResponse?: HttpErrorResponse, errorSubj?: Subject<string>) {
         let errorMessage = "An unknown error occured please try after sometime!!";
-
         if(typeof(errorResponse) === 'string') {
             if(errorSubj) {
                 errorSubj.next(errorResponse);
             }
             return throwError(errorResponse);
         }
-
         if(errorSubj) {
             errorSubj.next(errorMessage);
         }
-
         if( !errorResponse || !errorResponse.error || !errorResponse.error.error) {
             return throwError(errorMessage);
         }
-        
         switch(errorResponse.error.error.message) {
             case 'EMAIL_EXISTS':
                 errorMessage = 'This mail id already exists, please try to login!!';
@@ -72,7 +66,6 @@ export class AuthService {
     private handleSignUp(responseData: AuthResponse) {
         this.verifyEmail(responseData.email, responseData.idToken);
         this.deleteUserOnNotVerifying(responseData.idToken);
-        //this.handleAuthentication(responseData);
     }
 
     private deleteUserOnNotVerifying(tokenId: string) {
@@ -126,7 +119,7 @@ export class AuthService {
         })).subscribe();
     }
 
-    handlePhoneUser(phone: string, token: string) {
+    public handlePhoneUser(phone: string, token: string) {
         this.user.next(new PhoneUserModel(phone, token));
         //this.getUserData(token);
     }
@@ -140,7 +133,7 @@ export class AuthService {
         this.getUserData(responseData.idToken);
     }
 
-    signUp(email: string, password: string) {
+    public signUp(email: string, password: string) {
         
         this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
         {
@@ -151,11 +144,10 @@ export class AuthService {
         .pipe(catchError((errorResponse) => {
             return this.handleError(errorResponse, this.errorSub);
         }),
-        tap(this.handleSignUp.bind(this))).subscribe();
-        
+            tap(this.handleSignUp.bind(this))).subscribe();
     }
 
-    verifyEmail(email: string, idToken: string) {
+    public verifyEmail(email: string, idToken: string) {
         this.http.post('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI', {
             "requestType": "VERIFY_EMAIL",
             "idToken": idToken
@@ -166,7 +158,7 @@ export class AuthService {
         })).subscribe();
     }
 
-    resetPasswordOfUsers(email:string){
+    public resetPasswordOfUsers(email: string) {
         this.http.post('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',{
             "requestType":"PASSWORD_RESET",
             "email":email
@@ -177,8 +169,7 @@ export class AuthService {
         })).subscribe();
     }
 
-    login(email: string, password: string) {
-
+    public login(email: string, password: string) {
         this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
         {
             email: email,
@@ -188,11 +179,10 @@ export class AuthService {
         .pipe(catchError((errorResponse) => {
             return this.handleError(errorResponse, this.errorSub);
         }),
-        tap(this.handleAuthentication.bind(this))).subscribe();
-        
+            tap(this.handleAuthentication.bind(this))).subscribe();
     }
 
-    autoLogin() {
+    public autoLogin() {
         const userData: {
             _email: string, 
             _userId: string,

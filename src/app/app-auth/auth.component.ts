@@ -87,4 +87,8 @@ export class AuthComponent implements OnInit {
         this.loginWithPhone = !this.loginWithPhone;
         this.router.navigate(['phone-auth']);
     }
+    validatePassword(form: NgForm) {
+        console.log(form);
+    }
+
 }
