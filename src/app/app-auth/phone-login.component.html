@@ -19,9 +19,9 @@
                     SMS Login Code</button>
             </div>
             <div *ngIf="windowRef.confirmationResult">
-                <label for="code">Enter Your Verification Code Here</label>
+                <label for="code" style="margin-right: 10px;">Enter Your Verification Code Here: </label>
                 <input type="text" name="code" [(ngModel)]="verificationCode" class="input">
-                <div class="btn-toolbar">
+                <div class="btn-toolbar" style="padding-left: 209px; padding-top: 10px;">
                     <button class="btn btn-primary" (click)="verifyLoginCode()">Verify</button>
                 </div>
 
