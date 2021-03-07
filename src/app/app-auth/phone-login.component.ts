@@ -40,8 +40,8 @@ export class PasswordlessAuthComponent implements OnInit {
      
     this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
       'size': 'normal',
-      'callback': function (response) { 
-        this.sendotpEnables=false;
+      'callback': (response) =>{ 
+         this.sendotpEnables=false;
       }
     });
     this.windowRef.recaptchaVerifier.render();
