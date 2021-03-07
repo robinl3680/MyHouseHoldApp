@@ -3,6 +3,7 @@ import  firebase from 'firebase';
 import { WindowService } from '../app-auth/window.service';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
 export class PhoneNumber {
   country: string;
   area: string;
@@ -24,8 +25,9 @@ export class PasswordlessAuthComponent implements OnInit {
   phoneNumber = new PhoneNumber();
   verificationCode: string;
   user: any;
+  sendotpEnables=true;
   constructor(
-    private win: WindowService,private router: Router
+    private win: WindowService,private router: Router,private authService:AuthService
   ) { }
 
   ngOnInit() {
@@ -38,15 +40,14 @@ export class PasswordlessAuthComponent implements OnInit {
      
     this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
       'size': 'normal',
-      'callback': function (response) {
-        console.log(response);
+      'callback': function (response) { 
+        this.sendotpEnables=false;
       }
     });
     this.windowRef.recaptchaVerifier.render();
   }
 
   sendLoginCode() {
-    // debugger;
     var appVerifier = this.windowRef.recaptchaVerifier;
     const num = this.phoneNumber.e164;
     firebase.auth().signInWithPhoneNumber(num, appVerifier)
@@ -57,16 +58,21 @@ export class PasswordlessAuthComponent implements OnInit {
   }
 
   verifyLoginCode() {
-    debugger;
     this.windowRef.confirmationResult
       .confirm(this.verificationCode)
       .then(result => {
         this.user = result.user;
-        this.router.navigate(['/purchase-form']);
+        this.user.getIdToken().then(this.phoneauth.bind(this));
       })
       .catch(error => console.log(error, "Incorrect code entered?"))
 
   }
+
+  phoneauth(result:string){
+    this.authService.handlePhoneUser(this.user.phoneNumber,result);
+    this.router.navigate(['/purchase-form']);
+  }
+
   switchToPasswordAuth(){
     this.router.navigate(['/auth']);
   }

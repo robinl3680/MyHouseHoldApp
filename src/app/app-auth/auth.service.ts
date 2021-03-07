@@ -98,7 +98,7 @@ export class AuthService {
     }
 
     private onUserDataRecieved(response) {
-        if(response.users[0].emailVerified) {
+        if(response.users[0].emailVerified || response.users[0].isUserVerified) {
             this.verifiedUser.next(true);
             localStorage.setItem('userData', JSON.stringify(this.currentUser));
             this.autoLogOut(this.currentExpireTime);
@@ -128,6 +128,7 @@ export class AuthService {
 
     handlePhoneUser(phone: string, token: string) {
         this.user.next(new PhoneUserModel(phone, token));
+        //this.getUserData(token);
     }
 
 
