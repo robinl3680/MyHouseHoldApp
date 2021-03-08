@@ -5,13 +5,16 @@
                 <a routerLink="auth">Authenticate</a>
             </li>
             <li [routerLinkActive]="'active'" *ngIf="isAuthenticated">
-                <a  [routerLink]="['purchase-form']">Purchase Form</a>
+                <a [routerLink]="['groups-view']">Group view</a>
             </li>
-            <li [routerLinkActive]="'active'" *ngIf="isAuthenticated">
-                <a [routerLink]="['purchase-details']">Purchase Details</a>
+            <li [routerLinkActive]="'active'" *ngIf="isAuthenticated && groupName">
+                <a  [routerLink]="['purchase-form/' + groupName]">Purchase Form</a>
             </li>
-            <li [routerLinkActive]="'active'" *ngIf="isAuthenticated">
-                <a [routerLink]="['data-analysis']">Data Analysis</a>
+            <li [routerLinkActive]="'active'" *ngIf="isAuthenticated && groupName">
+                <a [routerLink]="['purchase-details/' + groupName]">Purchase Details</a>
+            </li>
+            <li [routerLinkActive]="'active'" *ngIf="isAuthenticated && groupName">
+                <a [routerLink]="['data-analysis/' + groupName]">Data Analysis</a>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">

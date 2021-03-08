@@ -11,13 +11,13 @@ export class PersonService {
 
     }
 
-    fetchPersonDetails() {
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/persons.json')
+    fetchPersonDetails(groupId: string) {
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/persons.json')
         .pipe(
             map((personDetails) => {
                 const persons: Person[] = [];
                 for(const key in personDetails) {
-                    persons.push({name: key, mobile: +personDetails[key]});
+                    persons.push({ name: personDetails[key].userName, mobile: +personDetails[key].mobileNumber});
                 }
                 return persons;
             } 

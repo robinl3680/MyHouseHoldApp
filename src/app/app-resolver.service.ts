@@ -14,7 +14,7 @@ export class AppResolver implements Resolve<ItemDetails[]> {
     resolve(route: ActivatedRouteSnapshot,  state: RouterStateSnapshot) {
         const items = this.purchaseService.getPurchasedItems();
         if(items.length === 0) {
-            return this.itemService.fetchData();
+            return this.itemService.fetchData(route.params['id']);
         } else {
             return items;
         }

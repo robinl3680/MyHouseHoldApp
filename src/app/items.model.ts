@@ -5,5 +5,5 @@ export interface ItemDetails {
     date: Date,
     person: string,
     key?: string,
-    details?: string
+    // details?: string
 }

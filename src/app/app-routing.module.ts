@@ -10,20 +10,18 @@ import { AppResolver } from './app-resolver.service';
 import { DataAnalysisComponent } from './data-analysis/data-analysis.component';
 import { AuthService } from './app-auth/auth.service';
 import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/detailed-data-view.component';
+import { HandleUserGroupsComponent } from "./handle-user-groups/handle-user-groups.component";
 
 const routes: Routes = [
     { path: '', redirectTo: 'auth', pathMatch: 'full' },
-    { path: 'purchase-form', component: PurchaseFormComponent, canActivate: [AuthGuard] },
-    { path: 'purchase-details', component: PurchaseDetailsComponent, resolve: [AppResolver], canActivate: [AuthGuard],
-      children: [
-          { path: ':id', component: DetailedViewComponent }
-      ] },
-    { path: 'purchase-form/:id', component: PurchaseFormComponent, canActivate: [AuthGuard], resolve: [AppResolver] },
-    { path: 'data-analysis', component: DataAnalysisComponent, canActivate: [AuthGuard], resolve: [AppResolver], 
+    { path: 'purchase-form/:id', component: PurchaseFormComponent, canActivate: [AuthGuard] },
+    { path: 'purchase-details/:id', component: PurchaseDetailsComponent, resolve: [AppResolver], canActivate: [AuthGuard]},
+    { path: 'data-analysis/:id', component: DataAnalysisComponent, canActivate: [AuthGuard], resolve: [AppResolver], 
         children: [
             { path: 'detailed-data-view', component: DetailedDataViewComponent, resolve: [AppResolver] }
         ] 
     },
+    { path: 'groups-view', component: HandleUserGroupsComponent, canActivate: [AuthGuard] },
     { path: 'auth', component: AuthComponent },
     { path: '**', redirectTo: 'auth' }
 ];

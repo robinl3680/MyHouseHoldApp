@@ -19,6 +19,7 @@ import { ChartsModule } from 'ng2-charts';
 import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/detailed-data-view.component';
 import { PasswordLengthValidator } from './shared/password-validator';
 import { PasswordMisMatchValidator } from './shared/password-mismatch-validator';
+import { HandleUserGroupsComponent } from './handle-user-groups/handle-user-groups.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { PasswordMisMatchValidator } from './shared/password-mismatch-validator'
     DataAnalysisComponent,
     DetailedDataViewComponent,
     PasswordLengthValidator,
-    PasswordMisMatchValidator
+    PasswordMisMatchValidator,
+    HandleUserGroupsComponent
   ],
   imports: [
     BrowserModule, 

@@ -13,7 +13,7 @@
           <div *ngIf="retrievedItems.length > 0">
             <ul class="list-group">
               <li class="list-group-item" *ngFor="let item of sortedList(); let i = index;">
-                <div style="cursor: pointer;" (click)="onClickItem(i)">
+                <div style="cursor: pointer;">
                     <h4>Category: {{item.item}}</h4>
                     <h5>Date of purchase: {{item.date}}</h5>
                     <h5>Amount costed: {{item.amount}}</h5>

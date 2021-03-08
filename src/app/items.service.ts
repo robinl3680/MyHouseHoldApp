@@ -16,14 +16,14 @@ export class ItemsService {
 
     }
     
-    accessItems() {
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/items.json')
+    accessItems(groupId: string) {
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/items.json')
                 .pipe(
                 map((items) => {
                     let itemArray: string[] = [];
                     for(const key in items) {
                         if(items.hasOwnProperty(key)) {
-                            itemArray = items[key].split(',');
+                            itemArray.push(items[key].itemName);
                         }
                     }
                     return itemArray;
@@ -31,8 +31,8 @@ export class ItemsService {
         );
     }
 
-    pushItems(item: ItemDetails) {
-        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/dailyData.json', item,
+    pushItems(groupId: string, item: ItemDetails) {
+        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/dailyData.json', item,
         {
             observe: 'response'
         })
@@ -41,8 +41,8 @@ export class ItemsService {
         }));
     }
 
-    fetchData() {
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/dailyData.json')
+    fetchData(groupId: string) {
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/dailyData.json')
                 .pipe(
                 map((itemsDetails) => {
                     let itemArray: ItemDetails[] = [];
@@ -62,7 +62,7 @@ export class ItemsService {
         );
     }
 
-    deleteEntry(key: string) {
-        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/dailyData/' + key + '.json' );
+    deleteEntry(groupId: string, key: string) {
+        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/dailyData/' + key + '.json' );
     }
 }

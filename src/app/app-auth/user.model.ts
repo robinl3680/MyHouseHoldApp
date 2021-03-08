@@ -5,13 +5,14 @@ export class UserModel {
         private _tokenExpires: Date) {
         
     }
+
     get token() {
         if(!this._tokenExpires || new Date() > this._tokenExpires) {
             return null;
         }
         return this._token;
     }
-    get userName() {
+    get userUniqueId() {
         return this._email;
     }
     get userID() {

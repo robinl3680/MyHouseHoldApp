@@ -31,7 +31,8 @@ export class AuthComponent implements OnInit {
     onSubmit(form: NgForm) {
         const email = form.value.email;
         const password = form.value.password;
-       
+        const phone = form.value.phone;
+        const userName = form.value['user-name'];
         this.isLoading = true;
 
         if(this.isLoginMode) {
@@ -48,7 +49,7 @@ export class AuthComponent implements OnInit {
             
         } 
         else {
-            this.authService.signUp(email, password);
+            this.authService.signUp(email, password, userName, phone);
             this.authService.emailVerifyAlert.subscribe((alert) => {
                 this.alert = alert;
                 form.reset();
@@ -60,7 +61,7 @@ export class AuthComponent implements OnInit {
         this.authService.verifiedUser.subscribe((data) => {
             if(data) {
                 this.isLoading = false;
-                this.router.navigate(['/purchase-form']);
+                this.router.navigate(['/groups-view']);
             } else {
                 this.isLoading = false;
                 this.error = "Please verify your email!!"
@@ -83,9 +84,4 @@ export class AuthComponent implements OnInit {
             this.isForgotPassword = !this.isForgotPassword;
         }
     }
-
-    validatePassword(form: NgForm) {
-        console.log(form);
-    }
-
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { UserModel } from './user.model';
 import { Router } from '@angular/router';
@@ -28,13 +28,15 @@ export class AuthService {
     currentExpireTime: number;
     isUserVerified = false;
     private autoDeleteInterval;
-
+    currentUserInfo = {};
+    currentUserPath: string;
     constructor(private http: HttpClient,
         private router: Router) {
 
     }
     public handleError(errorResponse?: HttpErrorResponse, errorSubj?: Subject<string>) {
         let errorMessage = "An unknown error occured please try after sometime!!";
+        this.currentUserInfo = {};
         if(typeof(errorResponse) === 'string') {
             if(errorSubj) {
                 errorSubj.next(errorResponse);
@@ -97,6 +99,13 @@ export class AuthService {
             localStorage.setItem('userData', JSON.stringify(this.currentUser));
             this.autoLogOut(this.currentExpireTime);
             this.user.next(this.currentUser);
+            if(this.currentUserInfo) {
+                this.user.subscribe((response) => {
+                    if(response) {
+                        this.addUserNamePhoneToUserPath(this.currentUser.userUniqueId);
+                    }
+                });
+            }
             clearInterval(this.autoDeleteInterval);
         } else {
             this.verifiedUser.next(false);
@@ -133,8 +142,9 @@ export class AuthService {
         this.getUserData(responseData.idToken);
     }
 
-    public signUp(email: string, password: string) {
-        
+    public signUp(email: string, password: string, userName: string, phone: string) {
+        this.currentUserInfo['userName'] = userName;
+        this.currentUserInfo['phone'] = phone;
         this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
         {
             email: email,
@@ -187,7 +197,8 @@ export class AuthService {
             _email: string, 
             _userId: string,
             _token: string,
-            _tokenExpires: string
+            _tokenExpires: string,
+            _userDetails: object
         } = JSON.parse(localStorage.getItem('userData'));
         if(userData) {
             const loadedUser = new UserModel(userData._email, userData._userId, userData._token, new Date(userData._tokenExpires));
@@ -216,4 +227,46 @@ export class AuthService {
         }
         this.router.navigate(['/auth']);
     }
+
+    addUserNamePhoneToUserPath(userId: string) {
+        this.loadCurrentUserPath(userId);
+        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/userData/' + this.currentUserPath + '/userInfo.json',
+            {
+                userName: this.currentUserInfo['userName'],
+                phone: this.currentUserInfo['phone']
+            },
+            {
+                observe: 'response'
+            })
+            .pipe(catchError((errorResponse) => {
+                return this.handleError(errorResponse, this.errorSub);
+            })).subscribe();
+    }
+
+    getUserInfo(userId: string) {
+        this.loadCurrentUserPath(userId);
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/userData/' + this.currentUserPath + '/userInfo.json')
+            .pipe(
+                map((responseData) => {
+                    const userInfo = {};
+                    for (const key in responseData) {
+                        userInfo['userName'] = responseData[key].userName;
+                        userInfo['phone'] = responseData[key].phone;
+                        return userInfo;
+                    }
+                }),
+                catchError((errorResponse) => {
+                    return this.handleError(errorResponse, this.errorSub);
+                })
+            );
+    }
+
+    loadCurrentUserPath(userId) {
+        if (userId.indexOf('@') > -1) {
+            this.currentUserPath = userId.replace(/[^a-zA-Z0-9]/g, '');
+        } else {
+            this.currentUserPath = userId;
+        }
+    }
+
 }

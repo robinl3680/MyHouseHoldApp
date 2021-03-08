@@ -21,7 +21,7 @@ export class AuthGuard implements CanActivate {
                     return true;
                 }
             } else {
-                if (user.token) {
+                if (user && user.token) {
                     return true;
                 }
             }

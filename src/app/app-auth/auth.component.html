@@ -10,6 +10,18 @@
             <app-loading-spinner></app-loading-spinner>Loading...
         </div>
         <form #form="ngForm" (ngSubmit)="onSubmit(form)" *ngIf="!isLoading">
+            <div class="form-group" *ngIf="!isForgotPassword && !isLoginMode">
+                <label for="user-name">Name</label>
+                <input type="text" class="form-control" id="user-name" name="user-name" required #username='ngModel' ngModel>
+                <div style="color: red" *ngIf="username.touched && username.errors?.required">This field can't be empty
+                </div>
+            </div>
+            <div class="form-group" *ngIf="!isForgotPassword && !isLoginMode">
+                <label for="phone">Phone number</label>
+                <input type="text" class="form-control" id="phone" name="phone" required #phone='ngModel' ngModel pattern=^((\\+91-?)|0)?[0-9]{10}$>
+                <div style="color: red" *ngIf="phone.touched && phone.errors?.required">This field can't be empty
+                </div>
+            </div>
             <div class="form-group" >
                 <label for="email">Email</label>
                 <input type="text" class="form-control" id="email" name="email" required email #email='ngModel' ngModel>

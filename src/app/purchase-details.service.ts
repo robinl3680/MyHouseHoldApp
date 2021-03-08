@@ -35,7 +35,7 @@ export class PurchaseDetailsService {
                 item: item.item,
                 amount: item.amount,
                   person: item.person,
-                  details: item.details
+                //   details: item.details
               });
             }
         }

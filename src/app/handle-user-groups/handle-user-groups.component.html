@@ -1,0 +1,121 @@
+<div class="container">
+    <div class="form-group">
+        <div class="row">
+            <a type="button" *ngIf="!isCreateMode" style="text-decoration: none; cursor: pointer;" (click)="createGroup()">Create new group</a>
+        </div>
+        <div *ngIf="isCreateMode">
+            <form #createForm="ngForm" (ngSubmit)="onSubmitCreateGroup(createForm)">
+                <div class="row">
+                    <div class="form-group">
+                        <div class="col col-md-2">
+                            <label for="group-name">Group Name</label>
+                        </div>
+                        <div class="col col-md-4">
+                            <input class="form-control" ngModel type="text" id="group-name" name="group-name" required>
+                        </div>
+                        <div  class="col col-md-4" *ngIf="error">
+                            <span style="color: red;">{{error}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-2">
+                    </div>
+                    <div class="btn btn-toolbar">
+                        <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid">Submit</button>
+                        <button type="button" class="btn btn-primary"
+                            (click)="onCancel()">Cancel</button>
+                    </div>
+                    <span *ngIf="uniqueId">successfully created share this id to other for join: {{uniqueId}}</span>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col col-md-4">
+                <a type="button" *ngIf="!isJoinMode" style="text-decoration: none; cursor: pointer;" (click)="joinGroup()">Join group</a>
+            </div>
+        </div>
+        <div *ngIf="isJoinMode">
+            <form #joinForm="ngForm" (ngSubmit)="onSubmitJoin(joinForm)">
+                <div class="row">
+                    <div class="form-group">
+                        <div class="col col-md-2">
+                            <label for="group-id">Unique Id</label>
+                        </div>
+                        <div class="col col-md-4">
+                            <input class="form-control" ngModel type="text" id="group-id" name="group-id" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-2">
+                    </div>
+                    <div class="btn btn-toolbar">
+                        <button type="submit" class="btn btn-primary" [disabled]="joinForm.invalid">Join</button>
+                        <button type="button" class="btn btn-primary" (click)="onCancel()">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col col-md-4">
+                <a type="button" style="text-decoration: none; cursor: pointer;" (click)="showGroups()">Show my gorups</a>
+            </div>
+            <div class="col col-md-4" *ngIf="groupList.length > 0 && isShowGroups">
+                <ul class="list-group">
+                    <li class="list-group-item" *ngFor="let item of groupList; let i = index;">
+                        <div style="cursor: pointer;" (click)="navigateToGroup(item)">
+                            <h6>Group name: {{item.groupName}}</h6>
+                            <h6>Group ID: {{item.key}}</h6>
+                        </div>
+                        <div class="btn-toolbar">
+                            <button type="button" class="btn btn-danger">Delete this entry</button>
+                            <button type="button" class="btn btn-primary">Modify this entry</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col col-md-4">
+                <a type="button" style="text-decoration: none; cursor: pointer;" (click)="enableAddItems()">Add items</a>
+            </div>
+        </div>
+        <form #itemForm="ngForm" *ngIf="addItemsMode" (ngSubmit)="addItems(itemForm)">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col col-md-2">
+                        <label for="item">Item name</label>
+                    </div>
+                    <div class="col col-md-4">
+                        <input class="form-control" type="text" name="item" id="item" ngModel>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-2">
+                        <label for="group-id">Group name</label>
+                    </div>
+                    <div class="col col-md-4">
+                        <select class="form-control" name="group-id" ngModel>
+                            <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-2">
+                    </div>
+                    <div class="btn btn-toolbar">
+                        <button type="submit" class="btn btn-primary" [disabled]="itemForm.invalid">Add</button>
+                        <button type="button" class="btn btn-primary" (click)="onCancel()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

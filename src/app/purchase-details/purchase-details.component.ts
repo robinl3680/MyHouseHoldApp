@@ -17,6 +17,7 @@ export class PurchaseDetailsComponent implements OnInit {
   error: string;
   fetChMode: boolean = true;
   searchMode: boolean = false;
+  groupName: string;
   constructor(private purchaseService: PurchaseDetailsService,
     private itemService: ItemsService, 
     private router: Router,
@@ -27,9 +28,12 @@ export class PurchaseDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   this.onFetchData();
    this.authService.errorSub.subscribe((errorMessage) => {
      this.error = errorMessage;
+   });
+   this.route.params.subscribe((data) => {
+      this.groupName = data['id'];
+      this.onFetchData();
    });
   }
 
@@ -44,7 +48,7 @@ export class PurchaseDetailsComponent implements OnInit {
   onDeleteData(key: string) {
     const isOkay = confirm("Do you really want to delete this entry ?");
     if(isOkay) {
-      this.itemService.deleteEntry(key)
+      this.itemService.deleteEntry(this.groupName, key)
       .subscribe((data)=> {
         this.onFetchData();
       });
@@ -52,7 +56,7 @@ export class PurchaseDetailsComponent implements OnInit {
   };
 
   onFetchData() {
-    this.itemService.fetchData()
+    this.itemService.fetchData(this.groupName)
     .subscribe((items)=>{
       this.purchaseService.populatePurchaseItems(items);
       this.retrievedItems = items;
@@ -64,11 +68,11 @@ export class PurchaseDetailsComponent implements OnInit {
   };
 
   onModifyEntry(key: string) {
-    this.router.navigate(['purchase-form/', key]);
+    this.router.navigate(['purchase-form/' + this.groupName], {queryParams: {itemKey: key}});
   };
 
-  onClickItem(index: number) {
-    this.router.navigate([index], {relativeTo: this.route});
-  }
+  // onClickItem(index: number) {
+  //   this.router.navigate([index], {relativeTo: this.route});
+  // }
 
 }

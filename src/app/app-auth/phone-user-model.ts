@@ -8,4 +8,7 @@ export class PhoneUserModel {
     get userPhone() {
         return this._phone;
     }
+    get userUniqueId() {
+        return this._phone;
+    }
 }

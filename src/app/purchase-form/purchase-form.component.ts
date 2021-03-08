@@ -24,6 +24,7 @@ export class PurchaseFormComponent implements OnInit {
   id: string;
   itemType: string;
   formData: ItemDetails;
+  groupName: string;
   @ViewChild('form') form: NgForm;
 
   constructor(private itemService: ItemsService, 
@@ -36,23 +37,31 @@ export class PurchaseFormComponent implements OnInit {
 
   ngOnInit() {
 
-    this.itemService.accessItems()
-      .subscribe((items) => {
-        this.itemCategories = items;
-      });
 
-    this.personService.fetchPersonDetails()
-    .subscribe((persons: Person[]) => {
-      this.persons = persons;
-    });
-    this.route.params.subscribe((data: Data)=> {
-      this.id = data['id'];
+    this.route.queryParams.subscribe((params) => {
+      this.id = params['itemKey'];
       this.formData = this.purchaseService.onModifyEntry(this.id);
       if (this.formData) {
         this.itemType = this.formData.item;
       }
-    });
+    })
 
+    this.route.params.subscribe((data: Data) => {
+      this.groupName = data['id'];
+      console.log(this.groupName);
+
+      this.itemService.accessItems(this.groupName)
+        .subscribe((items) => {
+          this.itemCategories = items;
+        });
+
+      this.personService.fetchPersonDetails(this.groupName)
+        .subscribe((persons: Person[]) => {
+          this.persons = persons;
+        });
+      this.onFetchData();
+    });
+ 
     if (this.id) {
       setTimeout(() => {
         if (this.formData) {
@@ -62,14 +71,15 @@ export class PurchaseFormComponent implements OnInit {
         }
       });
     }
+
     this.authService.errorSub.subscribe((errorMessage)=>{
       this.error = errorMessage;
     })
-    this.onFetchData();
+    
   };
 
   onFetchData() {
-    this.itemService.fetchData()
+    this.itemService.fetchData(this.groupName)
     .subscribe((items) => {
       this.purchaseService.populatePurchaseItems(items);
     }, (errorMessage: string) => {
@@ -81,7 +91,7 @@ export class PurchaseFormComponent implements OnInit {
     if(!this.id) {
       this.pushDetailsToServer(form); 
     } else {
-      this.itemService.deleteEntry(this.id)
+      this.itemService.deleteEntry(this.groupName, this.id)
       .subscribe(()=>{
         this.pushDetailsToServer(form);
       });
@@ -89,7 +99,7 @@ export class PurchaseFormComponent implements OnInit {
   };
 
   pushDetailsToServer(form: NgForm) {
-    this.itemService.pushItems(form.value)
+    this.itemService.pushItems(this.groupName, form.value)
       .subscribe((response) => {
            if(response.status === StatusCodes.OK) {
             this.onFetchData();
