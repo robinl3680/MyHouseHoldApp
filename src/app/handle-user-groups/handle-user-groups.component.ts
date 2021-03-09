@@ -41,6 +41,8 @@ export class HandleUserGroupsComponent implements OnInit {
     this.isJoinMode = false;
     this.addItemsMode = false;
     this.isShowGroups = false;
+    this.error = null;
+    this.alert = null;
   }
 
   onCancel() {
@@ -48,6 +50,8 @@ export class HandleUserGroupsComponent implements OnInit {
     this.isJoinMode = false;
     this.addItemsMode = false;
     this.isShowGroups = false;
+    this.error = null;
+    this.alert = null;
   }
 
   onSubmitCreateGroup(form: NgForm) {
@@ -59,8 +63,8 @@ export class HandleUserGroupsComponent implements OnInit {
         console.log(this.uniqueId);
         this.groupNames.push(groupName);
         this.groupService.addPersonToGroup(this.uniqueId);
-        this.groupService.addGroupToUserProfile(this.uniqueId, groupName);
         this.groupService.addGroupNameToGroupId(this.uniqueId, groupName);
+        this.groupService.addGroupToUserProfile(this.uniqueId, groupName);
       });
     } else {
       this.error = "This group is already there !!";
@@ -70,8 +74,12 @@ export class HandleUserGroupsComponent implements OnInit {
   onSubmitJoin(form: NgForm) {
     const groupId = form.value['group-id'];
     this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
-      this.groupService.addPersonToGroup(groupId);
-      this.groupService.addGroupToUserProfile(groupId, groupName);
+      if(groupName) {
+        this.groupService.addPersonToGroup(groupId);
+        this.groupService.addGroupToUserProfile(groupId, groupName);
+      } else {
+        this.error = "No such group is there !!";
+      }
     });
   }
 
@@ -85,6 +93,8 @@ export class HandleUserGroupsComponent implements OnInit {
     this.isCreateMode = false;
     this.addItemsMode = false;
     this.isShowGroups = false;
+    this.error = null;
+    this.alert = null;
   }
 
   showGroups() {
@@ -96,6 +106,8 @@ export class HandleUserGroupsComponent implements OnInit {
     this.isJoinMode = false;
     this.isCreateMode = false;
     this.addItemsMode = false;
+    this.error = null;
+    this.alert = null;
     this.disableModifyGroupName();
   }
 
@@ -104,6 +116,8 @@ export class HandleUserGroupsComponent implements OnInit {
     this.isCreateMode = false;
     this.isJoinMode = false;
     this.isShowGroups = false;
+    this.error = null;
+    this.alert = null;
   }
 
   addItems(form: NgForm) {
