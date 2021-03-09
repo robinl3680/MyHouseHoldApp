@@ -75,8 +75,12 @@ export class HandleUserGroupsComponent implements OnInit {
     const groupId = form.value['group-id'];
     this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
       if(groupName) {
-        this.groupService.addPersonToGroup(groupId);
-        this.groupService.addGroupToUserProfile(groupId, groupName);
+        if(this.groupNames.indexOf(groupName) === -1) {
+          this.groupService.addPersonToGroup(groupId);
+          this.groupService.addGroupToUserProfile(groupId, groupName);
+        } else {
+          this.error = "You already joined to this group!!";
+        }
       } else {
         this.error = "No such group is there !!";
       }
