@@ -20,15 +20,19 @@ export class HandleUserGroupsComponent implements OnInit {
   addItemsMode = false;
   isModificationMode = false;
   alert: string;
+  currentIndex: number;
   constructor(private groupService: UserGroupService,
     private router: Router) { 
 
   }
   ngOnInit(): void {
     this.groupService.clearAllData();
-    this.groupService.fetchGroup().subscribe(()=>{
-      this.groupNames = this.groupService.getGroupNames;
-      this.groupList = this.groupService.getGroupIdgroupMapping;
+    this.groupService.fetchGroup().subscribe();
+    this.groupService.groupNamesLoaded.subscribe((isLoaded) => {
+      if(isLoaded) {
+        this.groupNames = this.groupService.getGroupNames;
+        this.groupList = this.groupService.getGroupIdgroupMapping;
+      }
     });
     this.groupService.groupSubject.next(null);
     this.groupService.alertSubject.subscribe((alert) => {
@@ -73,18 +77,38 @@ export class HandleUserGroupsComponent implements OnInit {
 
   onSubmitJoin(form: NgForm) {
     const groupId = form.value['group-id'];
-    this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
-      if(groupName) {
-        if(this.groupNames.indexOf(groupName) === -1) {
-          this.groupService.addPersonToGroup(groupId);
-          this.groupService.addGroupToUserProfile(groupId, groupName);
+    
+    if(this.checkForDuplicateGroup(groupId)) {
+      this.error = "You already joined to this group!!";
+      this.alert = null;
+    } else {
+      this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
+        if (groupName) {
+          if (this.groupNames.indexOf(groupName) === -1) {
+            this.groupService.addPersonToGroup(groupId);
+            this.groupService.addGroupToUserProfile(groupId, groupName);
+            this.alert = "You successfully joined to the new group!!";
+            this.error = null;
+          } else {
+            this.error = "You already joined to this group!!";
+            this.alert = null;
+          }
         } else {
-          this.error = "You already joined to this group!!";
+          this.error = "No such group is there !!";
+          this.alert = null;
         }
-      } else {
-        this.error = "No such group is there !!";
+      });
+    }
+  }
+
+
+  checkForDuplicateGroup(groupId: string) {
+    for(let index = 0; index < this.groupList.length; index++) {
+      if(this.groupList[index].key === groupId) {
+        return true;
       }
-    });
+    }
+    return false;
   }
 
   navigateToGroup(item: groupMapping) {
@@ -103,9 +127,12 @@ export class HandleUserGroupsComponent implements OnInit {
 
   showGroups() {
     this.isShowGroups = true;
-    this.groupService.fetchGroup().subscribe(() => {
-      this.groupNames = this.groupService.getGroupNames;
-      this.groupList = this.groupService.getGroupIdgroupMapping;
+    this.groupService.fetchGroup().subscribe();
+    this.groupService.groupNamesLoaded.subscribe((isLoaded) => {
+      if(isLoaded) {
+        this.groupNames = this.groupService.getGroupNames;
+        this.groupList = this.groupService.getGroupIdgroupMapping;
+      }
     });
     this.isJoinMode = false;
     this.isCreateMode = false;
@@ -132,9 +159,10 @@ export class HandleUserGroupsComponent implements OnInit {
     });
   }
 
-  enableModifyGroup() {
+  enableModifyGroup(index) {
     this.isModificationMode = true;
     this.alert = null;
+    this.currentIndex = index;
   }
   disableModifyGroupName() {
     this.isModificationMode = false;

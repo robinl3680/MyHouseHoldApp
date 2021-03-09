@@ -21,6 +21,7 @@ export class UserGroupService implements OnDestroy {
     groupIdGroupMapping: groupMapping[] = [];
     groupSubject = new Subject<string>();
     alertSubject = new Subject<string>();
+    groupNamesLoaded = new Subject<boolean>();
     constructor(private http: HttpClient, private authService: AuthService) {
         
     }
@@ -70,6 +71,20 @@ export class UserGroupService implements OnDestroy {
             });
     }
 
+    fetchGroupNameFromGroupId(groupId: string) {
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json')
+            .pipe(
+                map((responseData) => {
+                    for(const key in responseData) {
+                        return responseData[key].groupName;
+                    }
+                }),
+                catchError((errorResponse) => {
+                    return this.authService.handleError(errorResponse, this.authService.errorSub);
+                })
+            );
+    }
+
     fetchGroup() {
         this.loadCurrentUserPath();
         return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
@@ -86,9 +101,12 @@ export class UserGroupService implements OnDestroy {
         this.groupNames = [];
         this.groupIdGroupMapping = [];
         for(const key in groupDetails) {
-            this.groupNames.push(groupDetails[key].groupName);
-            const group: groupMapping = { key: groupDetails[key].groupId, groupName: groupDetails[key].groupName };
-            this.groupIdGroupMapping.push(group);
+            this.fetchGroupNameFromGroupId(groupDetails[key].groupId).subscribe((groupName)=>{
+                this.groupNames.push(groupName);
+                const group: groupMapping = { key: groupDetails[key].groupId, groupName: groupName };
+                this.groupIdGroupMapping.push(group);
+                this.groupNamesLoaded.next(true);
+            });
         }
     }
 
@@ -158,9 +176,16 @@ export class UserGroupService implements OnDestroy {
         this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json').subscribe();
     }
 
-    deleteGroupNameFromUser() {
+    deleteGroupNameFromUser(groupId) {
         this.loadCurrentUserPath();
-        this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json').subscribe();
+        this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
+        .subscribe((responseData) => {
+            for(const key in responseData) {
+                if(responseData[key].groupId === groupId) {
+                    this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails/' + key +'/.json').subscribe();
+                }
+            }
+        });
     }
 
 
@@ -169,7 +194,7 @@ export class UserGroupService implements OnDestroy {
     }
 
     modifyGroupName(groupId: string, name: string) {
-        this.deleteGroupNameFromUser();
+        this.deleteGroupNameFromUser(groupId);
         this.deleteGroupNameFromGroup(groupId);
         this.addGroupNameToGroupId(groupId, name);
         this.addGroupToUserProfile(groupId, name);
