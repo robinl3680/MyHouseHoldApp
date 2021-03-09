@@ -3,7 +3,6 @@ import * as Chart from 'chart.js';
 import { PurchaseDetailsService } from '../purchase-details.service';
 import { ItemDetails } from '../items.model';
 import { Router, ActivatedRoute } from '@angular/router';
-import { title } from 'process';
 import { Label } from 'ng2-charts';
 import { FilterService } from '../filter-component/filter.service';
 

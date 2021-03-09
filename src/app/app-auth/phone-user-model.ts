@@ -6,9 +6,9 @@ export class PhoneUserModel {
         return this._token;
     }
     get userPhone() {
-        return this._phone;
+        return this._phone.split('+')[1];
     }
     get userUniqueId() {
-        return this._phone;
+        return this._phone.split('+')[1];
     }
 }

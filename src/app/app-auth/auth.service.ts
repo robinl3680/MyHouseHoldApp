@@ -31,9 +31,8 @@ export class AuthService {
     currentUserInfo = {};
     currentUserPath: string;
     constructor(private http: HttpClient,
-        private router: Router) {
+        private router: Router) { }
 
-    }
     public handleError(errorResponse?: HttpErrorResponse, errorSubj?: Subject<string>) {
         let errorMessage = "An unknown error occured please try after sometime!!";
         this.currentUserInfo = {};
@@ -94,7 +93,7 @@ export class AuthService {
     }
 
     private onUserDataRecieved(response) {
-        if(response.users[0].emailVerified) {
+        if(response.users[0].emailVerified || response.users[0].isUserVerified) {
             this.verifiedUser.next(true);
             localStorage.setItem('userData', JSON.stringify(this.currentUser));
             this.autoLogOut(this.currentExpireTime);
@@ -131,6 +130,7 @@ export class AuthService {
 
     public handlePhoneUser(phone: string, token: string) {
         this.user.next(new PhoneUserModel(phone, token));
+        //this.getUserData(token);
     }
 
 
@@ -230,7 +230,7 @@ export class AuthService {
 
     addUserNamePhoneToUserPath(userId: string) {
         this.loadCurrentUserPath(userId);
-        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/userData/' + this.currentUserPath + '/userInfo.json',
+        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/userInfo.json',
             {
                 userName: this.currentUserInfo['userName'],
                 phone: this.currentUserInfo['phone']
@@ -243,9 +243,43 @@ export class AuthService {
             })).subscribe();
     }
 
-    getUserInfo(userId: string) {
-        this.loadCurrentUserPath(userId);
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/userData/' + this.currentUserPath + '/userInfo.json')
+    getUserInfo(userId: any) {
+        if(isNaN(userId)) {
+            return this.getEmailUserDetails(userId);
+        } else {
+            return this.getPhoneUserDetails(userId);
+        }
+    }
+
+    loadCurrentUserPath(userId) {
+        if (userId.indexOf('@') > -1) {
+            this.currentUserPath = userId.replace(/[^a-zA-Z0-9]/g, '');
+        } else {
+            this.currentUserPath = userId;
+        }
+    }
+
+
+    getEmailUserDetails(email: string) {
+        this.loadCurrentUserPath(email);
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/userInfo.json')
+            .pipe(
+                map((responseData) => {
+                    const userInfo = {};
+                    for (const key in responseData) {
+                        userInfo['userName'] = responseData[key].userName;
+                        userInfo['phone'] = responseData[key].phone;
+                        return userInfo;
+                    }
+                }),
+                catchError((errorResponse) => {
+                    return this.handleError(errorResponse, this.errorSub);
+                })
+            ); 
+    }
+
+    getPhoneUserDetails(phone: string) {
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/phoneUserDetails/' + phone + '/userInfo.json')
             .pipe(
                 map((responseData) => {
                     const userInfo = {};
@@ -261,12 +295,17 @@ export class AuthService {
             );
     }
 
-    loadCurrentUserPath(userId) {
-        if (userId.indexOf('@') > -1) {
-            this.currentUserPath = userId.replace(/[^a-zA-Z0-9]/g, '');
-        } else {
-            this.currentUserPath = userId;
-        }
+    setPhoneUserDetails(name: string, phone: string) {
+        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/phoneUserDetails/' + phone + '/userInfo.json', 
+        {
+           userName: name,
+           phone: phone 
+        })
+            .pipe(
+                catchError((errorResponse) => {
+                    return this.handleError(errorResponse, this.errorSub);
+                })
+            ).subscribe();
     }
 
 }

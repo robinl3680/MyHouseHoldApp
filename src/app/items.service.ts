@@ -17,7 +17,7 @@ export class ItemsService {
     }
     
     accessItems(groupId: string) {
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/items.json')
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json')
                 .pipe(
                 map((items) => {
                     let itemArray: string[] = [];
@@ -32,7 +32,7 @@ export class ItemsService {
     }
 
     pushItems(groupId: string, item: ItemDetails) {
-        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/dailyData.json', item,
+        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData.json', item,
         {
             observe: 'response'
         })
@@ -42,7 +42,7 @@ export class ItemsService {
     }
 
     fetchData(groupId: string) {
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/dailyData.json')
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData.json')
                 .pipe(
                 map((itemsDetails) => {
                     let itemArray: ItemDetails[] = [];
@@ -63,6 +63,6 @@ export class ItemsService {
     }
 
     deleteEntry(groupId: string, key: string) {
-        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/dailyData/' + key + '.json' );
+        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData/' + key + '.json' );
     }
 }

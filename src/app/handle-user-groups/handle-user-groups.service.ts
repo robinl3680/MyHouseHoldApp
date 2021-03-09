@@ -40,7 +40,7 @@ export class UserGroupService implements OnDestroy {
 
     createNewGroup(groupName) {
         this.loadCurrentUserPath();
-        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/userData/' + this.currentUserPath + '.json', 
+        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '.json', 
         {
             groupName: groupName
         },
@@ -54,7 +54,7 @@ export class UserGroupService implements OnDestroy {
 
     addGroupToUserProfile(groupId: string, groupName: string) {
         this.loadCurrentUserPath();
-        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/userData/' + this.currentUserPath + '/groupDetails.json',
+        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json',
             {
                 groupId: groupId,
                 groupName: groupName
@@ -69,7 +69,7 @@ export class UserGroupService implements OnDestroy {
 
     fetchGroup() {
         this.loadCurrentUserPath();
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/userData/' + this.currentUserPath + '/groupDetails.json')
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
             .pipe(
                 tap(this.handleUserGroups.bind(this)),
                 catchError((errorResponse) => {
@@ -97,7 +97,7 @@ export class UserGroupService implements OnDestroy {
     }
 
     addItemsToGroup(groupId: string, item: string) {
-        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/items.json', {
+        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json', {
             itemName: item
         },
         {
@@ -110,7 +110,7 @@ export class UserGroupService implements OnDestroy {
 
     addPersonToGroup(groupId: string) {
         this.authService.getUserInfo(this.authService.user.value.userUniqueId).subscribe((userInfo) => {
-            this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/persons.json', {
+            this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/persons.json', {
                 userName: userInfo['userName'],
                 mobileNumber: userInfo['phone']
             },
@@ -124,7 +124,7 @@ export class UserGroupService implements OnDestroy {
     }
 
     addGroupNameToGroupId(groupId: string, groupName: string) {
-        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/groupNames.json', {
+        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json', {
             groupName: groupName
         },
             {
@@ -136,7 +136,7 @@ export class UserGroupService implements OnDestroy {
     }
 
     getGroupNameFromGroupId(groupId: string) {
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/' + groupId + '/groupNames.json')
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json')
             .pipe(
                 map((responseData) => {
                     for(const key in responseData) {

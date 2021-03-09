@@ -11,6 +11,7 @@ import { DataAnalysisComponent } from './data-analysis/data-analysis.component';
 import { AuthService } from './app-auth/auth.service';
 import { DetailedDataViewComponent } from './data-analysis/detailed-data-view/detailed-data-view.component';
 import { HandleUserGroupsComponent } from "./handle-user-groups/handle-user-groups.component";
+import { PasswordlessAuthComponent } from "./app-auth/phone-login.component";
 
 const routes: Routes = [
     { path: '', redirectTo: 'auth', pathMatch: 'full' },
@@ -21,6 +22,7 @@ const routes: Routes = [
             { path: 'detailed-data-view', component: DetailedDataViewComponent, resolve: [AppResolver] }
         ] 
     },
+    { path: 'phone-auth', component: PasswordlessAuthComponent },
     { path: 'groups-view', component: HandleUserGroupsComponent, canActivate: [AuthGuard] },
     { path: 'auth', component: AuthComponent },
     { path: '**', redirectTo: 'auth' }

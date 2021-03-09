@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { AuthService, AuthResponse } from './auth.service';
-import { Observable } from 'rxjs';
+import { AuthService} from './auth.service';
 import { Router } from '@angular/router';
 @Component({
     selector: 'app-auth',
@@ -14,10 +13,10 @@ export class AuthComponent implements OnInit {
     error: string = null;
     alert: string;
     isForgotPassword = false;
+    loginWithPhone = false;
 
     constructor(private authService: AuthService,
-        private router: Router) {
-    }
+        private router: Router) {  }
 
     ngOnInit() {
         this.authService.user.next(null);
@@ -84,4 +83,13 @@ export class AuthComponent implements OnInit {
             this.isForgotPassword = !this.isForgotPassword;
         }
     }
+
+    signInWithPhone() {
+        this.loginWithPhone = !this.loginWithPhone;
+        this.router.navigate(['phone-auth']);
+    }
+    validatePassword(form: NgForm) {
+        console.log(form);
+    }
+
 }
