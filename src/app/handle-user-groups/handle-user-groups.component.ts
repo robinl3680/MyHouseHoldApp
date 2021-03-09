@@ -18,6 +18,8 @@ export class HandleUserGroupsComponent implements OnInit {
   groupList: groupMapping[] = [];
   isShowGroups = false;
   addItemsMode = false;
+  isModificationMode = false;
+  alert: string;
   constructor(private groupService: UserGroupService,
     private router: Router) { 
 
@@ -29,6 +31,9 @@ export class HandleUserGroupsComponent implements OnInit {
       this.groupList = this.groupService.getGroupIdgroupMapping;
     });
     this.groupService.groupSubject.next(null);
+    this.groupService.alertSubject.subscribe((alert) => {
+      this.alert = alert;
+    });
   }
 
   createGroup() {
@@ -91,6 +96,7 @@ export class HandleUserGroupsComponent implements OnInit {
     this.isJoinMode = false;
     this.isCreateMode = false;
     this.addItemsMode = false;
+    this.disableModifyGroupName();
   }
 
   enableAddItems() {
@@ -106,6 +112,24 @@ export class HandleUserGroupsComponent implements OnInit {
     this.groupService.addItemsToGroup(groupId, item).subscribe((data) => {
       console.log(data);
     });
+  }
+
+  enableModifyGroup() {
+    this.isModificationMode = true;
+    this.alert = null;
+  }
+  disableModifyGroupName() {
+    this.isModificationMode = false;
+  }
+
+  onModifyGroupName(key: string, form: NgForm) {
+    const newName = form.value['newGroupName'];
+    if(this.groupNames.indexOf(newName) === -1) {
+      this.error = null;
+      this.groupService.modifyGroupName(key, newName);
+    } else {
+      this.error = "This group is already there !!";
+    }
   }
 
 }

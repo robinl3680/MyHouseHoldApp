@@ -65,20 +65,39 @@
             <div class="col col-md-4">
                 <a type="button" style="text-decoration: none; cursor: pointer;" (click)="showGroups()">Show my gorups</a>
             </div>
-            <div class="col col-md-4" *ngIf="groupList.length > 0 && isShowGroups">
-                <ul class="list-group">
-                    <li class="list-group-item" *ngFor="let item of groupList; let i = index;">
-                        <div style="cursor: pointer;" (click)="navigateToGroup(item)">
-                            <h6>Group name: {{item.groupName}}</h6>
-                            <h6>Group ID: {{item.key}}</h6>
-                        </div>
-                        <div class="btn-toolbar">
-                            <button type="button" class="btn btn-danger">Delete this entry</button>
-                            <button type="button" class="btn btn-primary">Modify this entry</button>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+            <form #groupForm="ngForm">
+                <div class="col col-md-4" *ngIf="groupList.length > 0 && isShowGroups">
+                    <ul class="list-group">
+                        <li class="list-group-item" *ngFor="let item of groupList; let i = index;">
+                            <div>
+                                <h6>Group name: {{item.groupName}}</h6>
+                                <h6>Group ID: {{item.key}}</h6>
+                                <div *ngIf="isModificationMode">
+                                    <input class="form-control" type="text" name="newGroupName" ngModel placeholder="New name" required>
+                                    <div class="btn-toolbar">
+                                        <button type="button" class="btn btn-primary" (click)="onModifyGroupName(item.key, groupForm)"
+                                        [disabled]="groupForm.invalid">Update</button>
+                                        <button type="button" class="btn btn-primary" (click)="disableModifyGroupName()">Cancel</button>
+                                    </div>
+                                </div>
+                                <div *ngIf="error && isModificationMode">
+                                    <span style="color: red;">{{error}}</span>
+                                </div>
+                                <div *ngIf="alert && isModificationMode">
+                                    <span style="color: green;">{{alert}}</span>
+                                </div>
+                            </div>
+                            <div class="btn-toolbar">
+                                <button type="button" class="btn btn-danger">Delete this entry</button>
+                                <button type="button" class="btn btn-primary" (click)="enableModifyGroup()">Modify this entry</button>
+                                <button type="button" class="btn btn-primary" (click)="navigateToGroup(item)">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </form>
         </div>
     </div>
     <div>

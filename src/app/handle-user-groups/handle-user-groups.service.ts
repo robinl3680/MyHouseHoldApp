@@ -20,6 +20,7 @@ export class UserGroupService implements OnDestroy {
     currentUserPath: string;
     groupIdGroupMapping: groupMapping[] = [];
     groupSubject = new Subject<string>();
+    alertSubject = new Subject<string>();
     constructor(private http: HttpClient, private authService: AuthService) {
         
     }
@@ -64,7 +65,9 @@ export class UserGroupService implements OnDestroy {
             })
             .pipe(catchError((errorResponse) => {
                 return this.authService.handleError(errorResponse, this.authService.errorSub);
-            })).subscribe();
+            })).subscribe((responseData) => {
+                this.deleteUnnecessaryData(groupId);
+            });
     }
 
     fetchGroup() {
@@ -78,13 +81,14 @@ export class UserGroupService implements OnDestroy {
             );
     }
 
+    
     handleUserGroups(groupDetails) {
+        this.groupNames = [];
+        this.groupIdGroupMapping = [];
         for(const key in groupDetails) {
-            if (this.groupNames.indexOf(groupDetails[key].groupName) === -1) {
-                this.groupNames.push(groupDetails[key].groupName);
-                const group: groupMapping = { key: groupDetails[key].groupId, groupName: groupDetails[key].groupName };
-                this.groupIdGroupMapping.push(group);
-            }
+            this.groupNames.push(groupDetails[key].groupName);
+            const group: groupMapping = { key: groupDetails[key].groupId, groupName: groupDetails[key].groupName };
+            this.groupIdGroupMapping.push(group);
         }
     }
 
@@ -132,7 +136,9 @@ export class UserGroupService implements OnDestroy {
             })
             .pipe(catchError((errorResponse) => {
                 return this.authService.handleError(errorResponse, this.authService.errorSub);
-            })).subscribe();
+            })).subscribe((responseData)=>{
+                this.alertSubject.next("Successfully updated !!");
+            });
     }
 
     getGroupNameFromGroupId(groupId: string) {
@@ -146,6 +152,27 @@ export class UserGroupService implements OnDestroy {
                 catchError((errorResponse) => {
                 return this.authService.handleError(errorResponse, this.authService.errorSub);
             }));
+    }
+
+    deleteGroupNameFromGroup(groupId: string) {
+        this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json').subscribe();
+    }
+
+    deleteGroupNameFromUser() {
+        this.loadCurrentUserPath();
+        this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json').subscribe();
+    }
+
+
+    deleteUnnecessaryData(key: string) {
+        this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/' + key + '.json').subscribe();
+    }
+
+    modifyGroupName(groupId: string, name: string) {
+        this.deleteGroupNameFromUser();
+        this.deleteGroupNameFromGroup(groupId);
+        this.addGroupNameToGroupId(groupId, name);
+        this.addGroupToUserProfile(groupId, name);
     }
 
     ngOnDestroy() {
