@@ -82,8 +82,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
         console.log(this.uniqueId);
         this.groupNames.push(groupName);
         this.groupService.addPersonToGroup(this.uniqueId);
-        this.groupService.addGroupNameToGroupId(this.uniqueId, groupName);
-        this.groupService.addGroupToUserProfile(this.uniqueId, groupName);
+        this.groupService.addGroupNameToGroupId(this.uniqueId, groupName).subscribe();
+        this.groupService.addGroupToUserProfile(this.uniqueId, groupName).subscribe();
       });
     } else {
       this.error = "This group is already there !!";
@@ -101,7 +101,7 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
         if (groupName) {
           if (this.groupNames.indexOf(groupName) === -1) {
             this.groupService.addPersonToGroup(groupId);
-            this.groupService.addGroupToUserProfile(groupId, groupName);
+            this.groupService.addGroupToUserProfile(groupId, groupName).subscribe();
             this.alert = "You successfully joined to the new group!!";
             this.error = null;
           } else {
@@ -202,12 +202,14 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   }
 
   onClickLeaveOrDelete(creator: string, groupId: string) {
-    this.leavingMode = true;
     if(creator === this.currentUser) { //Delete case
 
     } else { //Leave case
+      this.leavingMode = true;
       this.groupService.deletePersonFromGroup(groupId);
-      this.groupService.deleteGroupNameFromUser(groupId);
+      this.groupService.deleteGroupNameFromUser(groupId).subscribe((response)=>{
+        response.subscribe();
+      });
     }
   }
 }

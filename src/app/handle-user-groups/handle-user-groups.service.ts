@@ -57,7 +57,7 @@ export class UserGroupService implements OnDestroy {
 
     addGroupToUserProfile(groupId: string, groupName: string) {
         this.loadCurrentUserPath();
-        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json',
+        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json',
             {
                 groupId: groupId,
                 groupName: groupName
@@ -67,9 +67,7 @@ export class UserGroupService implements OnDestroy {
             })
             .pipe(catchError((errorResponse) => {
                 return this.authService.handleError(errorResponse, this.authService.errorSub);
-            })).subscribe((responseData) => {
-                this.deleteUnnecessaryData(groupId);
-            });
+            }));
     }
 
     fetchGroupNameFromGroupId(groupId: string) {
@@ -163,7 +161,7 @@ export class UserGroupService implements OnDestroy {
     }
 
     addGroupNameToGroupId(groupId: string, groupName: string) {
-        this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json', {
+        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json', {
             groupName: groupName,
             creator: this.authService.user.value.userUniqueId
         },
@@ -172,9 +170,7 @@ export class UserGroupService implements OnDestroy {
             })
             .pipe(catchError((errorResponse) => {
                 return this.authService.handleError(errorResponse, this.authService.errorSub);
-            })).subscribe((responseData)=>{
-                this.alertSubject.next("Successfully updated !!");
-            });
+            }));
     }
 
     getGroupNameFromGroupId(groupId: string) {
@@ -191,19 +187,19 @@ export class UserGroupService implements OnDestroy {
     }
 
     deleteGroupNameFromGroup(groupId: string) {
-        this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json').subscribe();
+        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json');
     }
 
     deleteGroupNameFromUser(groupId) {
         this.loadCurrentUserPath();
-        this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
-        .subscribe((responseData) => {
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
+        .pipe(map((responseData) => {
             for(const key in responseData) {
                 if(responseData[key].groupId === groupId) {
-                    this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails/' + key +'/.json').subscribe();
+                    return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails/' + key +'/.json');
                 }
             }
-        });
+        }));
     }
 
 
@@ -225,10 +221,18 @@ export class UserGroupService implements OnDestroy {
     }
 
     modifyGroupName(groupId: string, name: string) {
-        this.deleteGroupNameFromUser(groupId);
-        this.deleteGroupNameFromGroup(groupId);
-        this.addGroupNameToGroupId(groupId, name);
-        this.addGroupToUserProfile(groupId, name);
+        this.deleteGroupNameFromUser(groupId).subscribe((observable)=>{
+            observable.subscribe((response)=>{
+                this.deleteGroupNameFromGroup(groupId).subscribe(() => {
+                    this.addGroupNameToGroupId(groupId, name).subscribe(() => {
+                        this.alertSubject.next("Successfully updated !!");
+                        this.addGroupToUserProfile(groupId, name).subscribe(() => {
+                            this.deleteUnnecessaryData(groupId);
+                        });;
+                    });
+                });
+            })
+        });
     }
 
     ngOnDestroy() {

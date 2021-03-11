@@ -100,7 +100,7 @@
                                 </div>
                             </div>
                             <div class="btn-toolbar">
-                                <button type="button" class="btn btn-danger" (click)="onClickLeaveOrDelete(item.creator, item.key)">{{ currentUser === item.creator ? 'Delete group' : 'Leave group'}}</button>
+                                <button type="button" class="btn btn-danger" [disabled]="currentUser === item.creator" (click)="onClickLeaveOrDelete(item.creator, item.key)">{{ currentUser === item.creator ? 'Delete group' : 'Leave group'}}</button>
                                 <button type="button" class="btn btn-primary" (click)="enableModifyGroup(i)" *ngIf="currentUser === item.creator">Modify group name</button>
                                 <button type="button" class="btn btn-primary" [show-delay]="1000" autoPlacement="true" tooltip="navigate to group" (click)="navigateToGroup(item)">
                                     <span class="glyphicon glyphicon-chevron-right"></span>
