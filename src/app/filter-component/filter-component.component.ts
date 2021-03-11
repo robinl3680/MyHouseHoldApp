@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewChecked, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewChecked, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { FilterService } from './filter.service';
 
@@ -7,7 +7,7 @@ import { FilterService } from './filter.service';
   templateUrl: './filter-component.component.html',
   styleUrls: ['./filter-component.component.css']
 })
-export class FilterComponent implements OnInit {
+export class FilterComponent implements OnInit, OnDestroy {
 
   filterOptions = ['Amount spent', 'Name of person', 'Date of Purchase'];
   selectedOption: string;
@@ -20,7 +20,10 @@ export class FilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    
+  }
+  ngOnDestroy(): void {
+    this.filterService.name = '';
   }
 
   filterAscend() {

@@ -6,7 +6,8 @@ import { AuthService } from "../app-auth/auth.service";
 
 export interface groupMapping {
     key: string,
-    groupName: string
+    groupName: string,
+    creator: string
 }
 
 @Injectable({
@@ -76,7 +77,10 @@ export class UserGroupService implements OnDestroy {
             .pipe(
                 map((responseData) => {
                     for(const key in responseData) {
-                        return responseData[key].groupName;
+                        const groupObj = {};
+                        groupObj['groupName'] = responseData[key].groupName;
+                        groupObj['creator'] = responseData[key].creator;
+                        return groupObj;
                     }
                 }),
                 catchError((errorResponse) => {
@@ -100,13 +104,25 @@ export class UserGroupService implements OnDestroy {
     handleUserGroups(groupDetails) {
         this.groupNames = [];
         this.groupIdGroupMapping = [];
-        for(const key in groupDetails) {
-            this.fetchGroupNameFromGroupId(groupDetails[key].groupId).subscribe((groupName)=>{
-                this.groupNames.push(groupName);
-                const group: groupMapping = { key: groupDetails[key].groupId, groupName: groupName };
-                this.groupIdGroupMapping.push(group);
-                this.groupNamesLoaded.next(true);
-            });
+        if(groupDetails) {
+            const length = Object.keys(groupDetails).length;
+            let count = 0;
+            for (const key in groupDetails) {
+                this.fetchGroupNameFromGroupId(groupDetails[key].groupId).subscribe((groupObj) => {
+                    if(groupObj) {
+                        count++;
+                        this.groupNames.push(groupObj['groupName']);
+                        const group: groupMapping = { key: groupDetails[key].groupId, groupName: groupObj['groupName'], creator: groupObj['creator'] };
+                        this.groupIdGroupMapping.push(group);
+                        if (count === length) {
+                            this.groupNamesLoaded.next(true);
+                        }
+                    }
+                });
+            }
+        } else {
+            this.groupNamesLoaded.next(true);
+            this.alertSubject.next("You don't have any group currently !!");
         }
     }
 
@@ -134,7 +150,8 @@ export class UserGroupService implements OnDestroy {
         this.authService.getUserInfo(this.authService.user.value.userUniqueId).subscribe((userInfo) => {
             this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/persons.json', {
                 userName: userInfo['userName'],
-                mobileNumber: userInfo['phone']
+                mobileNumber: userInfo['phone'],
+                userUniqueId: this.authService.user.value.userUniqueId
             },
                 {
                     observe: 'response'
@@ -147,7 +164,8 @@ export class UserGroupService implements OnDestroy {
 
     addGroupNameToGroupId(groupId: string, groupName: string) {
         this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json', {
-            groupName: groupName
+            groupName: groupName,
+            creator: this.authService.user.value.userUniqueId
         },
             {
                 observe: 'response'
@@ -191,6 +209,19 @@ export class UserGroupService implements OnDestroy {
 
     deleteUnnecessaryData(key: string) {
         this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/' + key + '.json').subscribe();
+    }
+
+    deletePersonFromGroup(groupId: string) {
+        this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/persons.json')
+            .subscribe((responseData) => {
+                for (const key in responseData) {
+                    if (responseData[key].userUniqueId === this.authService.user.value.userUniqueId) {
+                        this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/persons/' + key + '/.json').subscribe(()=> {
+                            this.fetchGroup().subscribe();
+                        });
+                    }
+                }
+            });
     }
 
     modifyGroupName(groupId: string, name: string) {

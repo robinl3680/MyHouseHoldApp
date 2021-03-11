@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../app-auth/auth.service';
 import { groupMapping, UserGroupService } from './handle-user-groups.service';
 
 @Component({
@@ -8,7 +10,7 @@ import { groupMapping, UserGroupService } from './handle-user-groups.service';
   templateUrl: './handle-user-groups.component.html',
   styleUrls: ['./handle-user-groups.component.css']
 })
-export class HandleUserGroupsComponent implements OnInit {
+export class HandleUserGroupsComponent implements OnInit, OnDestroy {
 
   isCreateMode = false;
   isJoinMode = false;
@@ -21,23 +23,36 @@ export class HandleUserGroupsComponent implements OnInit {
   isModificationMode = false;
   alert: string;
   currentIndex: number;
+  subscription: Subscription;
+  creatorSubscription: Subscription;
+  userLeftSubscription: Subscription;
+  currentUser: string;
+  leavingMode = false;
   constructor(private groupService: UserGroupService,
-    private router: Router) { 
+    private router: Router, private authService: AuthService) { 
 
   }
   ngOnInit(): void {
     this.groupService.clearAllData();
-    this.groupService.fetchGroup().subscribe();
-    this.groupService.groupNamesLoaded.subscribe((isLoaded) => {
-      if(isLoaded) {
-        this.groupNames = this.groupService.getGroupNames;
-        this.groupList = this.groupService.getGroupIdgroupMapping;
-      }
-    });
     this.groupService.groupSubject.next(null);
     this.groupService.alertSubject.subscribe((alert) => {
       this.alert = alert;
     });
+    this.creatorSubscription = this.authService.user.subscribe((userData) => {
+      this.currentUser = userData ? userData.userUniqueId : null;
+    });
+  }
+
+  ngOnDestroy() {
+    if(this.subscription) {
+      this.subscription.unsubscribe();
+    }
+    if(this.creatorSubscription) {
+      this.creatorSubscription.unsubscribe();
+    }
+    if (this.userLeftSubscription) {
+      this.userLeftSubscription.unsubscribe();
+    }
   }
 
   createGroup() {
@@ -125,15 +140,22 @@ export class HandleUserGroupsComponent implements OnInit {
     this.alert = null;
   }
 
+  fetchAllGroups() {
+    this.groupService.fetchGroup().subscribe();
+    this.subscription = this.groupService.groupNamesLoaded.subscribe(this.handleGroupLoaded.bind(this));
+  }
+
+  handleGroupLoaded(isLoaded) {
+    if (isLoaded) {
+      this.groupNames = this.groupService.getGroupNames;
+      this.groupList = this.groupService.getGroupIdgroupMapping;
+      this.leavingMode = false;
+    }
+  }
+
   showGroups() {
     this.isShowGroups = true;
-    this.groupService.fetchGroup().subscribe();
-    this.groupService.groupNamesLoaded.subscribe((isLoaded) => {
-      if(isLoaded) {
-        this.groupNames = this.groupService.getGroupNames;
-        this.groupList = this.groupService.getGroupIdgroupMapping;
-      }
-    });
+    this.fetchAllGroups();
     this.isJoinMode = false;
     this.isCreateMode = false;
     this.addItemsMode = false;
@@ -143,6 +165,7 @@ export class HandleUserGroupsComponent implements OnInit {
   }
 
   enableAddItems() {
+    this.fetchAllGroups();
     this.addItemsMode = true;
     this.isCreateMode = false;
     this.isJoinMode = false;
@@ -178,4 +201,13 @@ export class HandleUserGroupsComponent implements OnInit {
     }
   }
 
+  onClickLeaveOrDelete(creator: string, groupId: string) {
+    this.leavingMode = true;
+    if(creator === this.currentUser) { //Delete case
+
+    } else { //Leave case
+      this.groupService.deletePersonFromGroup(groupId);
+      this.groupService.deleteGroupNameFromUser(groupId);
+    }
+  }
 }

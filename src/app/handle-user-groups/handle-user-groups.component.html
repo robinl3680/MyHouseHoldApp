@@ -1,5 +1,10 @@
 <div class="container">
     <div class="form-group">
+        <div class="row" *ngIf="groupList.length === 0 && alert && !isCreateMode">
+            <div class="alert alert-danger">
+                {{alert}}
+            </div>
+        </div>
         <div class="row">
             <a type="button" *ngIf="!isCreateMode" style="text-decoration: none; cursor: pointer;" (click)="createGroup()">Create new group</a>
         </div>
@@ -73,14 +78,15 @@
             </div>
             <form #groupForm="ngForm">
                 <div class="col col-md-4" *ngIf="groupList.length > 0 && isShowGroups">
-                    <ul class="list-group">
+                    <app-loading-spinner *ngIf="leavingMode"></app-loading-spinner>
+                    <ul class="list-group" *ngIf="!leavingMode && groupNames.length > 0">
                         <li class="list-group-item" *ngFor="let item of groupList; let i = index;">
                             <div>
                                 <h6>Group name: {{item.groupName}}</h6>
                                 <h6>Group ID: {{item.key}}</h6>
                                 <div *ngIf="isModificationMode && currentIndex === i">
                                     <input class="form-control" type="text" name="newGroupName" ngModel placeholder="New name" required>
-                                    <div class="btn-toolbar">
+                                    <div class="btn-toolbar" >
                                         <button type="button" class="btn btn-primary" (click)="onModifyGroupName(item.key, groupForm)"
                                         [disabled]="groupForm.invalid">Update</button>
                                         <button type="button" class="btn btn-primary" (click)="disableModifyGroupName()">Cancel</button>
@@ -94,9 +100,9 @@
                                 </div>
                             </div>
                             <div class="btn-toolbar">
-                                <button type="button" class="btn btn-danger">Delete this entry</button>
-                                <button type="button" class="btn btn-primary" (click)="enableModifyGroup(i)">Modify this entry</button>
-                                <button type="button" class="btn btn-primary" (click)="navigateToGroup(item)">
+                                <button type="button" class="btn btn-danger" (click)="onClickLeaveOrDelete(item.creator, item.key)">{{ currentUser === item.creator ? 'Delete group' : 'Leave group'}}</button>
+                                <button type="button" class="btn btn-primary" (click)="enableModifyGroup(i)" *ngIf="currentUser === item.creator">Modify group name</button>
+                                <button type="button" class="btn btn-primary" [show-delay]="1000" autoPlacement="true" tooltip="navigate to group" (click)="navigateToGroup(item)">
                                     <span class="glyphicon glyphicon-chevron-right"></span>
                                 </button>
                             </div>
