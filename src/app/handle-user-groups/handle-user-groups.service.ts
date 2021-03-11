@@ -161,7 +161,7 @@ export class UserGroupService implements OnDestroy {
     }
 
     addGroupNameToGroupId(groupId: string, groupName: string) {
-        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json', {
+        return this.http.patch('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames/groupInfo.json', {
             groupName: groupName,
             creator: this.authService.user.value.userUniqueId
         },
@@ -202,6 +202,28 @@ export class UserGroupService implements OnDestroy {
         }));
     }
 
+    modifyGroupNameFromUser(groupId: string, groupName: string) {
+        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
+            .pipe(map((responseData) => {
+                for (const key in responseData) {
+                    if (responseData[key].groupId === groupId) {
+                        return this.http.patch('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails/' + key + '/.json',
+                        {
+                            groupId: groupId,
+                            groupName: groupName
+                        });
+                    }
+                }
+            }));
+    }
+
+    modifyGroupNameFromGroup(groupId: string, groupName: string) {
+        return this.http.patch('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames/groupInfo.json', 
+        {
+            groupName: groupName,
+            creator: this.authService.user.value.userUniqueId
+        }); 
+    }
 
     deleteUnnecessaryData(key: string) {
         this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/' + key + '.json').subscribe();
@@ -221,17 +243,15 @@ export class UserGroupService implements OnDestroy {
     }
 
     modifyGroupName(groupId: string, name: string) {
-        this.deleteGroupNameFromUser(groupId).subscribe((observable)=>{
-            observable.subscribe((response)=>{
-                this.deleteGroupNameFromGroup(groupId).subscribe(() => {
-                    this.addGroupNameToGroupId(groupId, name).subscribe(() => {
+        this.modifyGroupNameFromUser(groupId, name).subscribe((response) => {
+            if(response) {
+                response.subscribe(() => {
+                    this.modifyGroupNameFromGroup(groupId, name).subscribe(() => {
                         this.alertSubject.next("Successfully updated !!");
-                        this.addGroupToUserProfile(groupId, name).subscribe(() => {
-                            this.deleteUnnecessaryData(groupId);
-                        });;
+                        this.fetchGroup().subscribe();
                     });
                 });
-            })
+            }
         });
     }
 

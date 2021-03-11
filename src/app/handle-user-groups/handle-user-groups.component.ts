@@ -74,16 +74,16 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   }
 
   onSubmitCreateGroup(form: NgForm) {
-    console.log(form);
     const groupName = form.value['group-name'];
     if(this.groupNames.indexOf(groupName) === -1) {
       this.groupService.createNewGroup(groupName).subscribe((response) => {
         this.uniqueId = response.body['name'];
-        console.log(this.uniqueId);
         this.groupNames.push(groupName);
         this.groupService.addPersonToGroup(this.uniqueId);
         this.groupService.addGroupNameToGroupId(this.uniqueId, groupName).subscribe();
-        this.groupService.addGroupToUserProfile(this.uniqueId, groupName).subscribe();
+        this.groupService.addGroupToUserProfile(this.uniqueId, groupName).subscribe((response) => {
+          this.groupService.deleteUnnecessaryData(this.uniqueId);
+        });
       });
     } else {
       this.error = "This group is already there !!";
@@ -175,10 +175,11 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   }
 
   addItems(form: NgForm) {
+    this.alert = null;
     const groupId = form.value['group-id'];
     const item = form.value['item'];
-    this.groupService.addItemsToGroup(groupId, item).subscribe((data) => {
-      console.log(data);
+    this.groupService.addItemsToGroup(groupId, item).subscribe((response) => {
+      this.alert = "Item added successfully";
     });
   }
 
@@ -195,6 +196,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     const newName = form.value['newGroupName'];
     if(this.groupNames.indexOf(newName) === -1) {
       this.error = null;
+      this.leavingMode = true;
+      this.isModificationMode = false;
       this.groupService.modifyGroupName(key, newName);
     } else {
       this.error = "This group is already there !!";

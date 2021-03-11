@@ -48,8 +48,6 @@ export class PurchaseFormComponent implements OnInit {
 
     this.route.params.subscribe((data: Data) => {
       this.groupName = data['id'];
-      console.log(this.groupName);
-
       this.itemService.accessItems(this.groupName)
         .subscribe((items) => {
           this.itemCategories = items;
