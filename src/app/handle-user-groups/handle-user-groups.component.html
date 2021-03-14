@@ -76,6 +76,9 @@
             <div class="col col-md-4">
                 <a type="button" style="text-decoration: none; cursor: pointer;" (click)="showGroups()">Show my gorups</a>
             </div>
+            <div *ngIf="alert">
+                <div class="alert alert-warning">{{alert}}</div>
+            </div>
             <form #groupForm="ngForm">
                 <div class="col col-md-4" *ngIf="groupList.length > 0 && isShowGroups">
                     <app-loading-spinner *ngIf="leavingMode"></app-loading-spinner>
@@ -100,7 +103,7 @@
                                 </div>
                             </div>
                             <div class="btn-toolbar">
-                                <button type="button" class="btn btn-danger" [disabled]="currentUser === item.creator" (click)="onClickLeaveOrDelete(item.creator, item.key)">{{ currentUser === item.creator ? 'Delete group' : 'Leave group'}}</button>
+                                <button type="button" class="btn btn-danger" (click)="onClickLeaveOrDelete(item.creator, item.key)">{{ currentUser === item.creator ? 'Delete group' : 'Leave group'}}</button>
                                 <button type="button" class="btn btn-primary" (click)="enableModifyGroup(i)" *ngIf="currentUser === item.creator">Modify group name</button>
                                 <button type="button" class="btn btn-primary" [show-delay]="1000" autoPlacement="true" tooltip="navigate to group" (click)="navigateToGroup(item)">
                                     <span class="glyphicon glyphicon-chevron-right"></span>

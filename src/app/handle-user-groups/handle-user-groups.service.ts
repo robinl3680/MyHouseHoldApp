@@ -103,7 +103,7 @@ export class UserGroupService implements OnDestroy {
         this.groupNames = [];
         this.groupIdGroupMapping = [];
         if(groupDetails) {
-            const length = Object.keys(groupDetails).length;
+            let length = Object.keys(groupDetails).length;
             let count = 0;
             for (const key in groupDetails) {
                 this.fetchGroupNameFromGroupId(groupDetails[key].groupId).subscribe((groupObj) => {
@@ -112,9 +112,16 @@ export class UserGroupService implements OnDestroy {
                         this.groupNames.push(groupObj['groupName']);
                         const group: groupMapping = { key: groupDetails[key].groupId, groupName: groupObj['groupName'], creator: groupObj['creator'] };
                         this.groupIdGroupMapping.push(group);
-                        if (count === length) {
-                            this.groupNamesLoaded.next(true);
-                        }
+                    } else {
+                        length = length - 1;
+                        this.deleteGroupNameFromUser(groupDetails[key].groupId).subscribe((response) => {
+                            response.subscribe(() => {
+                                this.alertSubject.next("The group which you joined: " + groupDetails[key].groupName + " is deleted by creator");
+                            });
+                        });
+                    }
+                    if (count === length) {
+                        this.groupNamesLoaded.next(true);
                     }
                 });
             }
@@ -190,7 +197,7 @@ export class UserGroupService implements OnDestroy {
         return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/groupNames.json');
     }
 
-    deleteGroupNameFromUser(groupId) {
+    deleteGroupNameFromUser(groupId: string) {
         this.loadCurrentUserPath();
         return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
         .pipe(map((responseData) => {
@@ -200,6 +207,10 @@ export class UserGroupService implements OnDestroy {
                 }
             }
         }));
+    }
+
+    deleteGroup(groupId: string) {
+        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '.json'); 
     }
 
     modifyGroupNameFromUser(groupId: string, groupName: string) {
