@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import  firebase from 'firebase';
+import firebase from 'firebase';
 import { WindowService } from '../app-auth/window.service';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';

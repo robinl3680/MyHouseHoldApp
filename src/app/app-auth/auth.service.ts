@@ -7,12 +7,12 @@ import { Router } from '@angular/router';
 import { StatusCodes } from 'http-status-codes';
 import { PhoneUserModel } from './phone-user-model';
 export interface AuthResponse {
-    idToken: string,
-    email: string,
-    refreshToken: string,
-    expiresIn: string,
-    localId: string,
-    registered?: boolean
+    idToken: string;
+    email: string;
+    refreshToken: string;
+    expiresIn: string;
+    localId: string;
+    registered?: boolean;
 }
 @Injectable({
     providedIn: 'root'

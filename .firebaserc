@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "householdapp-7db63": {
+      "hosting": {
+        "MyHouseHoldApp": [
+          "householdapp-7db63"
+        ]
+      }
+    }
+  }
+}

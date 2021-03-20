@@ -207,9 +207,12 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   onClickLeaveOrDelete(creator: string, groupId: string) {
     if(creator === this.currentUser) { //Delete case
       if(confirm("Are sure want to delete ?")) {
+        this.leavingMode = true;
         this.groupService.deleteGroupNameFromUser(groupId).subscribe((responseData) => {
           responseData.subscribe(() => {
-            this.groupService.deleteGroup(groupId).subscribe();
+            this.groupService.deleteGroup(groupId).subscribe(() => {
+              this.fetchAllGroups();
+            });
           });
         });
       }
