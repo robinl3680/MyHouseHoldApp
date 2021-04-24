@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { Person } from '../person.model';
 import { NgForm } from '@angular/forms';
 import { ItemsService } from '../items.service';
@@ -15,7 +15,7 @@ import { ItemDetails } from '../items.model';
   styleUrls: ['./purchase-form.component.css']
 })
 export class PurchaseFormComponent implements OnInit {
-
+ 
   itemCategories: string[] = [];
   persons: Person[] = [];
   isSuccess = false;
@@ -24,6 +24,7 @@ export class PurchaseFormComponent implements OnInit {
   id: string;
   itemType: string;
   formData: ItemDetails;
+ 
   groupName: string;
   @ViewChild('form') form: NgForm;
 
@@ -32,12 +33,9 @@ export class PurchaseFormComponent implements OnInit {
     private purchaseService: PurchaseDetailsService,
     private route: ActivatedRoute,
     private authService: AuthService) {
-
   }
 
   ngOnInit() {
-
-
     this.route.queryParams.subscribe((params) => {
       this.id = params['itemKey'];
       this.formData = this.purchaseService.onModifyEntry(this.id);
@@ -57,12 +55,15 @@ export class PurchaseFormComponent implements OnInit {
         .subscribe((persons: Person[]) => {
           this.persons = persons;
         });
+       
       this.onFetchData();
     });
  
     if (this.id) {
       setTimeout(() => {
         if (this.formData) {
+          this.form.value.personsDistributedAmounts='';
+          this.itemService.eachPersonsDeatils.next(this.formData);
           this.form.setValue(this.formData);
         } else {
           this.error = "Data can't be loaded!!";
@@ -86,6 +87,7 @@ export class PurchaseFormComponent implements OnInit {
   }
 
   onSubmitDetails(form: NgForm) {
+    form.value.personsDistributedAmounts = this.purchaseService.getIndividualPurchaseDetails();
     if(!this.id) {
       this.pushDetailsToServer(form); 
     } else {
@@ -112,6 +114,8 @@ export class PurchaseFormComponent implements OnInit {
   onModelChange() {
     this.isSuccess = false;
     this.enableClear = true;
+    this.personService.costEntered.next(this.form.value);
+    //this.distrubuiteAmountEqualy();
   };
 
   onModelChangeItemCombo() {

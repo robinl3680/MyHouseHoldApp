@@ -2,11 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Person } from './person.model';
+import { ItemDetails } from './items.model';
+import { Subject } from 'rxjs/internal/Subject';
 
 @Injectable({
     providedIn: "root"
 })
 export class PersonService {
+    costEntered=new Subject<ItemDetails>();
     constructor(private http: HttpClient) {
 
     }

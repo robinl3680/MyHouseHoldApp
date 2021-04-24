@@ -23,6 +23,7 @@ import { AngularFireAuthModule } from '@angular/fire/auth'
 import { PasswordLengthValidator } from './shared/password-validator';
 import { PasswordMisMatchValidator } from './shared/password-mismatch-validator';
 import { HandleUserGroupsComponent } from './handle-user-groups/handle-user-groups.component';
+import { SliptUpComponent } from './purchase-form/slipt-up/slipt-up.component';
 
 const firebaseConfig = {};
 @NgModule({
@@ -40,7 +41,8 @@ const firebaseConfig = {};
     PasswordlessAuthComponent,
     PasswordLengthValidator,
     PasswordMisMatchValidator,
-    HandleUserGroupsComponent
+    HandleUserGroupsComponent,
+    SliptUpComponent
   ],
   imports: [
     BrowserModule, 

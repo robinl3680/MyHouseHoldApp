@@ -1,0 +1,33 @@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">
+            <!-- <form > -->
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Persons</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label style="margin-right: 10px;" for="amount">Amount</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row" *ngFor="let item of persons; let i=index" >
+                        <div class="col-md-3" >
+                            <span style="font-size: medium;">{{item.name}}</span>
+                            <input style="margin: 10px;" type="checkbox"  name="checkbox" id="checkbox" [checked]="checked"
+                            (click)="onModelChange(i, $event.target.checked)"
+                          required/>
+                        </div>
+                        <div class="col-md-3">
+                            <input style="margin: 10px; margin-left: 0px;" class="form-control" type="text" name="amount" id="amount"  required
+                           [value]="checkBoxInfo[i] ? individualSum : 0"  disabled>
+                        </div>
+                    </div>
+
+                </div>
+            <!-- </form> -->
+        </div>
+    </div>
+</div>

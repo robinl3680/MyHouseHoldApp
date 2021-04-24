@@ -1,15 +1,23 @@
 import { Injectable } from '@angular/core';
-import { ItemDetails } from './items.model';
+import { ItemDetails, PersonsDistributedAmounts } from './items.model';
 import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: "root"
 })
 export class PurchaseDetailsService {
-
+    individualPurchaseDetails=[];
     private retrievedItems: ItemDetails[] = [];
     error: string;
     // onDetailedItemView: Subject<ItemDetails[]> = new Subject<ItemDetails[]>();
+
+    getIndividualPurchaseDetails(){
+        return this.individualPurchaseDetails;
+    }
+    
+    setIndividualPurchaseDetails(purchaseDetails){
+      this.individualPurchaseDetails = purchaseDetails;
+    }
      
     populatePurchaseItems(items: ItemDetails[]) {
         this.retrievedItems = items;
@@ -35,6 +43,7 @@ export class PurchaseDetailsService {
                 item: item.item,
                 amount: item.amount,
                   person: item.person,
+                  personsDistributedAmounts:item.personsDistributedAmounts,
                 //   details: item.details
               });
             }

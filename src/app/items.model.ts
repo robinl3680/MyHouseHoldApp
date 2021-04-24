@@ -5,5 +5,11 @@ export interface ItemDetails {
     date: Date,
     person: string,
     key?: string,
+    personsDistributedAmounts: PersonsDistributedAmounts[],
     // details?: string
+}
+
+export interface PersonsDistributedAmounts{
+    personsName: string;
+    amountOfEachPersons: number; 
 }

@@ -15,7 +15,7 @@ import { PasswordlessAuthComponent } from "./app-auth/phone-login.component";
 
 const routes: Routes = [
     { path: '', redirectTo: 'auth', pathMatch: 'full' },
-    { path: 'purchase-form/:id', component: PurchaseFormComponent, canActivate: [AuthGuard] },
+    { path: 'purchase-form/:id', component: PurchaseFormComponent, canActivate: [AuthGuard],resolve: [AppResolver] },
     { path: 'purchase-details/:id', component: PurchaseDetailsComponent, resolve: [AppResolver], canActivate: [AuthGuard]},
     { path: 'data-analysis/:id', component: DataAnalysisComponent, canActivate: [AuthGuard], resolve: [AppResolver], 
         children: [

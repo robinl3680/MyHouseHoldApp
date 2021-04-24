@@ -1,8 +1,8 @@
-<div class="container">
+<div class="container col-lg-12">
     <div class="row">
-      <div class="col-md-12 pull-left" style="margin-top: 15px;">
-        <h4 class="alert alert-danger" *ngIf="error">{{error}}</h4>
         <form (ngSubmit)="onSubmitDetails(form)" #form="ngForm" *ngIf="!error">
+          <div class="col-lg-6" style="margin-top: 15px;">
+            <h4 class="alert alert-danger" *ngIf="error">{{error}}</h4>
           <div class="form-group">
             <div class="row">
               <div class="col-md-2">
@@ -76,6 +76,7 @@
               </div>
             </div>
           </div>
+          
           <div class="row">
             <div class="col-md-2">
             </div>
@@ -87,14 +88,20 @@
               (click)="resetForm(true)"
               [disabled]="!enableClear">Clear</button>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" class="form-group">
               <span>
                 <h4 *ngIf="isSuccess">{{id ? 'Data successfully modified!!' : 'Data successfully uploaded!!'}}</h4>
               </span>
             </div>
           </div>
           <br>
+        </div>
+        <div class="col-lg-6">
+          <app-slipt-up [groupName]="groupName" ></app-slipt-up>
+        </div>
+        <input type="hidden" name="personsDistributedAmounts"  class="form-control"
+        ngModel />
         </form>
-      </div>
+     
     </div>
   </div>

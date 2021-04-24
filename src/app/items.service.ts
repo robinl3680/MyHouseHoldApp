@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, catchError, tap } from 'rxjs/operators';
-import { ItemDetails } from './items.model';
-import { throwError } from 'rxjs';
+import { ItemDetails, PersonsDistributedAmounts } from './items.model';
+import { Subject, throwError } from 'rxjs';
 import { AuthService } from './app-auth/auth.service';
 import { PurchaseDetailsService } from './purchase-details.service';
 
@@ -10,7 +10,7 @@ import { PurchaseDetailsService } from './purchase-details.service';
     providedIn: "root"
 })
 export class ItemsService {
-
+    eachPersonsDeatils=new Subject<ItemDetails>();
     constructor(private http: HttpClient, private authService: AuthService,
         private purchaseService: PurchaseDetailsService) {
 
