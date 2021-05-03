@@ -44,13 +44,7 @@ export class SliptUpComponent implements OnInit {
             for (let index in this.persons) {
               if (this.modefyData && this.modefyData.personsDistributedAmounts) {
                 this.populateCheckBoxInfo(this.modefyData.personsDistributedAmounts, index);
-                if (this.modefyData.personsDistributedAmounts[index].personsName === this.persons[index].name) {
-                  if (this.modefyData.personsDistributedAmounts[index].amountOfEachPersons !== 0) {
-                    this.individualSum = this.modefyData.personsDistributedAmounts[index].amountOfEachPersons;
-                  } else {
-                    this.individualSum = this.modefyData.personsDistributedAmounts[index].amountOfEachPersons;
-                  }
-                }
+                this.defaultDistrubuiteAmountEqualy(this.modefyData.amount, this.modefyData.personsDistributedAmounts);
               } else{
                 this.checkBoxInfo[index] = true;
               }
@@ -70,7 +64,7 @@ export class SliptUpComponent implements OnInit {
     let contributedPeopleNames = contributedPeople.map(person => {
       return person.personsName;
     });
-    if (contributedPeopleNames.indexOf(this.persons[index].name) > -1) {
+    if (contributedPeopleNames.indexOf(this.persons[index].name) > -1 && contributedPeople[index].amountOfEachPersons > 0) {
       this.checkBoxInfo[index] = true;
     } else {
       this.checkBoxInfo[index] = false;
