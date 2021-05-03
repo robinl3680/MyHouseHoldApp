@@ -92,6 +92,16 @@ export class PurchaseFormComponent implements OnInit {
 
   onSubmitDetails(form: NgForm) {
     form.value.personsDistributedAmounts = this.purchaseService.getIndividualPurchaseDetails();
+    if(this.multiSelect) {
+      let individualTransactions = {};
+      for(let person of this.persons) {
+        if(this.form.value[person.name]) {
+          form.value.multiPerson = true;
+          individualTransactions[person.name] = form.value[person.name];
+        }
+      }
+      form.value.individualTransaction = individualTransactions;
+    }
     if(!this.id) {
       this.pushDetailsToServer(form); 
     } else {

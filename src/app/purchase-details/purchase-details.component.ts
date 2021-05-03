@@ -18,6 +18,7 @@ export class PurchaseDetailsComponent implements OnInit {
   fetChMode: boolean = true;
   searchMode: boolean = false;
   groupName: string;
+  individualTransactions = [];
   constructor(private purchaseService: PurchaseDetailsService,
     private itemService: ItemsService, 
     private router: Router,
@@ -55,11 +56,24 @@ export class PurchaseDetailsComponent implements OnInit {
     }
   };
 
+
+  populateIndividualTransaction() {
+    for(let item of this.retrievedItems) {
+      if(item.multiPerson) {
+        const keys = Object.keys(item.individualTransaction);
+        for(let key of keys) {
+          this.individualTransactions.push(key + ': ' + item.individualTransaction[key]);
+        }
+      }
+    }
+  }
+
   onFetchData() {
     this.itemService.fetchData(this.groupName)
     .subscribe((items)=>{
       this.purchaseService.populatePurchaseItems(items);
       this.retrievedItems = items;
+      this.populateIndividualTransaction();
       this.fetChMode = false;
     }, (errorMessage: string) => {
       this.error = errorMessage;

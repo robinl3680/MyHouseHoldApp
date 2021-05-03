@@ -6,6 +6,8 @@ export interface ItemDetails {
     person: string,
     key?: string,
     personsDistributedAmounts: PersonsDistributedAmounts[],
+    multiPerson?: boolean,
+    individualTransaction?: {}
     // details?: string
 }
 

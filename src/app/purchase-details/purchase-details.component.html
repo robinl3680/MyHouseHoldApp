@@ -17,7 +17,12 @@
                     <h4>Category: {{item.item}}</h4>
                     <h5>Date of purchase: {{item.date}}</h5>
                     <h5>Amount costed: {{item.amount}}</h5>
-                    <h4>Name of Person: {{item.person}}</h4>
+                    <h4 *ngIf="!item.multiPerson">Name of Person: {{item.person}}</h4>
+                    <div *ngIf="item.multiPerson">
+                      <h4 *ngFor="let trans of individualTransactions">
+                        {{trans}}
+                      </h4>
+                    </div>
                 </div>
                 <div class="btn-toolbar">
                   <button type="button" 

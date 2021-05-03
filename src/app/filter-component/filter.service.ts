@@ -59,9 +59,23 @@ export class FilterService {
 
     matchSearchedData(retrievedItems: ItemDetails[]) {
        if(this.name) {
-            return retrievedItems.filter( (value) =>
-                value.person.toLowerCase() === this.name.toLowerCase()
-            );
+           let returnArr = [];
+            for(let index in retrievedItems) {
+                if(!retrievedItems[index].multiPerson) {
+                    if(this.name.trim().toLowerCase() === retrievedItems[index].person.toLowerCase()) {
+                        returnArr.push(retrievedItems[index]);
+                    }
+                } else {
+                    let keys = Object.keys(retrievedItems[index]);
+                    keys = keys.map(key => {
+                        return key.toLowerCase();
+                    });
+                    if(keys.indexOf(this.name.toLowerCase()) > -1) {
+                        returnArr.push(retrievedItems[index]);
+                    }
+                }
+            }
+            return returnArr;
        } else {
            return retrievedItems;
        }
