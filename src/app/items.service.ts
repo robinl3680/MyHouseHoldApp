@@ -10,7 +10,7 @@ import { PurchaseDetailsService } from './purchase-details.service';
     providedIn: "root"
 })
 export class ItemsService {
-    eachPersonsDeatils=new Subject<ItemDetails>();
+    eachPersonsDeatils = new Subject<ItemDetails>();
     constructor(private http: HttpClient, private authService: AuthService,
         private purchaseService: PurchaseDetailsService) {
 

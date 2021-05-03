@@ -24,7 +24,11 @@ export class PurchaseFormComponent implements OnInit {
   id: string;
   itemType: string;
   formData: ItemDetails;
- 
+  multiSelect = false;
+  multiSelectCheckBoxInfo = {};
+  disableSubmitOnMultiSelect = false;
+  totalCost = 0;
+
   groupName: string;
   @ViewChild('form') form: NgForm;
 
@@ -73,7 +77,7 @@ export class PurchaseFormComponent implements OnInit {
 
     this.authService.errorSub.subscribe((errorMessage)=>{
       this.error = errorMessage;
-    })
+    });
     
   };
 
@@ -114,9 +118,20 @@ export class PurchaseFormComponent implements OnInit {
   onModelChange() {
     this.isSuccess = false;
     this.enableClear = true;
-    this.personService.costEntered.next(this.form.value);
     //this.distrubuiteAmountEqualy();
   };
+
+  onModelChangeAmount() {
+    this.onModelChange();
+    if(this.id) {
+      this.personService.costEntered.next(this.formData);
+    } else {
+      this.personService.costEntered.next(this.form.value);
+    }
+    if(this.multiSelect) {
+      this.onModelChangeMultiPeopleEachValueEntered();
+    }
+  }
 
   onModelChangeItemCombo() {
     this.isSuccess = false;
@@ -125,6 +140,31 @@ export class PurchaseFormComponent implements OnInit {
       this.itemType = this.form.value['item'];
     }
   };
+
+  onMultiSelectOption(checked) {
+    this.multiSelect = checked;
+    this.disableSubmitOnMultiSelect = checked;
+    this.multiSelectCheckBoxInfo = {};
+  }
+
+  onModelChangeMultiSelectEachCheck(name, checked) {
+    this.multiSelectCheckBoxInfo[name] = checked;
+  }
+
+  onModelChangeMultiPeopleEachValueEntered() {
+    this.totalCost = 0;
+    for(let person of this.persons) {
+      if(this.multiSelectCheckBoxInfo[person.name]) {
+        let cost = +this.form.value[person.name];
+        this.totalCost += cost;
+      }
+    }
+    if(this.totalCost === this.form.value['amount']) {
+      this.disableSubmitOnMultiSelect = false;
+    } else {
+      this.disableSubmitOnMultiSelect = true;
+    }
+  }
 
   resetForm(isClear?: boolean) {
     if(this.form) {

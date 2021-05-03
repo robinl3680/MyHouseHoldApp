@@ -16,7 +16,7 @@
                     <div class="row" *ngFor="let item of persons; let i=index" >
                         <div class="col-md-3" >
                             <span style="font-size: medium;">{{item.name}}</span>
-                            <input style="margin: 10px;" type="checkbox"  name="checkbox" id="checkbox" [checked]="checked"
+                            <input style="margin: 10px;" type="checkbox"  name="checkbox" id="checkbox" [checked]="checkBoxInfo[i]"
                             (click)="onModelChange(i, $event.target.checked)"
                           required/>
                         </div>

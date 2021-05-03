@@ -55,7 +55,7 @@
               ngModel
               required
               pattern="[1-9]+[0-9]*"
-              (ngModelChange)="onModelChange()">
+              (ngModelChange)="onModelChangeAmount()">
              </div>
            </div>
           </div>
@@ -64,15 +64,28 @@
               <div class="col-md-2">
                 <label for="person">Name of Person</label>
               </div>
-              <div class="col-md-5">
+              <div class="col-md-5" *ngIf="!multiSelect">
                 <select class="form-control"
                 name="person"
                 ngModel
                 required
                 (ngModelChange)="onModelChange()">
                   <option *ngFor="let person of persons"
-                  [value]="person.name">{{person.name}}</option>
+                  [value]="person.name">
+                  {{person.name}}
+                </option>
                 </select>
+              </div>
+              <div class="col-md-5" *ngIf="multiSelect">
+                <div name="person"  *ngFor="let person of persons; let i = index">
+                  <label for="eachName">{{person.name}}</label>
+                  <input style="margin-left: 5px;" type="checkbox" name="individualCheck" (click)="onModelChangeMultiSelectEachCheck(person.name, $event.target.checked)">
+                  <input type="text" class="form-control" ngModel [name]="person.name" *ngIf="multiSelectCheckBoxInfo[person.name]" (ngModelChange)="onModelChangeMultiPeopleEachValueEntered()">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label for="multiPerson">Multiple People</label>
+                <input style="margin-left: 5px;" type="checkbox" name="multiPerson" (click)="onMultiSelectOption($event.target.checked)">
               </div>
             </div>
           </div>
@@ -82,7 +95,7 @@
             </div>
             <div class="col-md-3 btn-toolbar">
               <button type="submit" class="btn btn-primary"
-              [disabled]="!form.valid">{{ id ? 'Modify' : 'Submit'}}</button>
+              [disabled]="!form.valid || disableSubmitOnMultiSelect">{{ id ? 'Modify' : 'Submit'}}</button>
               <button type="button" 
               class="btn btn-warning" 
               (click)="resetForm(true)"

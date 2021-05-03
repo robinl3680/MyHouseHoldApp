@@ -21,7 +21,7 @@ export class SliptUpComponent implements OnInit {
   error: string;
   uncheckedBoxes: number;
   checkBoxInfo = {};
-  personsDetails={};
+  personsDetails = {};
   modefyData:ItemDetails;
   
   @Input() groupName: string;
@@ -33,66 +33,76 @@ export class SliptUpComponent implements OnInit {
 
   ngOnInit() {
     this.itemsService.eachPersonsDeatils.subscribe((personsDetails)=>{
-      this.modefyData=personsDetails;
-    })
+      this.modefyData = personsDetails;
+    });
     this.personService.fetchPersonDetails(this.groupName)
       .subscribe((persons: Person[]) => {
-        this.persons = persons;
-        this.uncheckedBoxes = persons.length;
-        if(this.uncheckedBoxes>0){
-          for(let index in this.persons){
-            if(this.modefyData.personsDistributedAmounts[index].personsName===this.persons[index].name){
-              if(this.modefyData.personsDistributedAmounts[index].amountOfEachPersons!==0){
+        if(this.persons.length === 0) {
+          this.persons = persons;
+          this.uncheckedBoxes = persons.length;
+          if (this.uncheckedBoxes > 0) {
+            for (let index in this.persons) {
+              if (this.modefyData && this.modefyData.personsDistributedAmounts) {
+                this.populateCheckBoxInfo(this.modefyData.personsDistributedAmounts, index);
+                if (this.modefyData.personsDistributedAmounts[index].personsName === this.persons[index].name) {
+                  if (this.modefyData.personsDistributedAmounts[index].amountOfEachPersons !== 0) {
+                    this.individualSum = this.modefyData.personsDistributedAmounts[index].amountOfEachPersons;
+                  } else {
+                    this.individualSum = this.modefyData.personsDistributedAmounts[index].amountOfEachPersons;
+                  }
+                }
+              } else{
                 this.checkBoxInfo[index] = true;
-                this.individualSum=this.modefyData.personsDistributedAmounts[index].amountOfEachPersons;
-              }else{
-                this.checkBoxInfo[index] = false;
-                this.individualSum=this.modefyData.personsDistributedAmounts[index].amountOfEachPersons;
               }
             }
-            else {
-              // sonarLint
-            }
           }
-         }
+        }
       });
+
     this.personService.costEntered.subscribe(x => {
       this.enteredCostByUser = x.amount;
-      this.defaultDistrubuiteAmountEqualy(this.enteredCostByUser);
+      this.defaultDistrubuiteAmountEqualy(this.enteredCostByUser, x.personsDistributedAmounts);
     });
 
   }
   
-
-  defaultDistrubuiteAmountEqualy(amount) {
-    for(let index in this.persons) {
-
+  populateCheckBoxInfo(contributedPeople, index) {
+    let contributedPeopleNames = contributedPeople.map(person => {
+      return person.personsName;
+    });
+    if (contributedPeopleNames.indexOf(this.persons[index].name) > -1) {
       this.checkBoxInfo[index] = true;
+    } else {
+      this.checkBoxInfo[index] = false;
     }
+  }
 
-    if (amount) {
-      this.individualSum = amount / this.uncheckedBoxes;
-      this.pushPersonsIndividualDetails();
-      return this.individualSum;
-    } 
-    
+  defaultDistrubuiteAmountEqualy(amount, contributedPeople?) {
+    if(this.persons.length > 0) {
+      for (let index in this.persons) {
+        if (contributedPeople) {
+          this.populateCheckBoxInfo(contributedPeople, index);
+        }
+      }
+      amount = amount === null ? 0 : amount;
+      if (amount !== null) {
+        let checkedCount = Object.values(this.checkBoxInfo).filter(x => x === true).length;
+        this.individualSum = amount / checkedCount;
+        this.pushPersonsIndividualDetails();
+        return this.individualSum;
+      } 
+    }
   }
   
   onModelChange(index, isChecked) {
-    if(this.uncheckedBoxes !== undefined && !isChecked) {
-      this.uncheckedBoxes--;
-    } else {
-      if(this.uncheckedBoxes !== undefined && isChecked ) {
-        this.uncheckedBoxes++;
-      }
-    }
     this.checkBoxInfo[index] = isChecked;
-    this.individualSum = this.enteredCostByUser / this.uncheckedBoxes; 
+    let checkedCount = Object.values(this.checkBoxInfo).filter(x => x === true).length;
+    this.individualSum = this.enteredCostByUser / checkedCount; 
     this.pushPersonsIndividualDetails();
   }
 
   pushPersonsIndividualDetails(){
-    let purchaseDetails=[];
+    let purchaseDetails = [];
     for(let index in this.persons){
       purchaseDetails.push(
         {
