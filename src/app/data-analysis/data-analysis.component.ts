@@ -128,10 +128,20 @@ export class DataAnalysisComponent implements OnInit {
       } else {
         itemDataMap[item.item] = item.amount;
       }
-      if (personDataMap[item.person]) {
-        personDataMap[item.person] += item.amount;
+      if(item.multiPerson) {
+        for(let key in item.individualTransaction) {
+          if(personDataMap[key]) {
+            personDataMap[key] += +item.individualTransaction[key];
+          } else {
+            personDataMap[key] = +item.individualTransaction[key];
+          }
+        }
       } else {
-        personDataMap[item.person] = item.amount;
+        if (personDataMap[item.person]) {
+          personDataMap[item.person] += item.amount;
+        } else {
+          personDataMap[item.person] = item.amount;
+        }
       }
     }
   }

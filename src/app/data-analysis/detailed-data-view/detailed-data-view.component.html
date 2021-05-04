@@ -6,6 +6,9 @@
         <h4 style="color: rgb(86, 90, 50)" *ngIf="item.details">Details: {{ item.details }}</h4>
         <h5 style="color: rgb(153, 204, 255)">Date of purchase: {{ item.date }}</h5>
         <h5 style="color: rgb(255, 80, 80)">Amount costed: {{ item.amount }}</h5>
-        <h4 style="color: rgb(153, 204, 0)">Name of Person: {{ item.person }}</h4>
+        <h4 *ngIf="!item.multiPerson" style="color: rgb(153, 204, 0)">Name of Person: {{ item.person }}</h4>
+        <div *ngIf="item.multiPerson">
+            <h4 *ngFor="let trans of individualTransactions[item.key]" style="color: rgb(153, 204, 0)">{{trans}}</h4>
+        </div>
     </li>
 </ul>

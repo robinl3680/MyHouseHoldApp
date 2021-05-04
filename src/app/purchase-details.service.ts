@@ -57,8 +57,14 @@ export class PurchaseDetailsService {
             if( type === 'item' && item.item === label ) {
                 selectedData.push( item );
             } else {
-                if( type === 'person' && item.person === label ) {
-                    selectedData.push( item );
+                if(item.multiPerson) {
+                    if(Object.keys(item).indexOf(label) > -1) {
+                        selectedData.push(item);
+                    }
+                } else {
+                    if (type === 'person' && item.person === label) {
+                        selectedData.push(item);
+                    }
                 }
             }
         }

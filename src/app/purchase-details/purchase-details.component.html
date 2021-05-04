@@ -19,7 +19,7 @@
                     <h5>Amount costed: {{item.amount}}</h5>
                     <h4 *ngIf="!item.multiPerson">Name of Person: {{item.person}}</h4>
                     <div *ngIf="item.multiPerson">
-                      <h4 *ngFor="let trans of individualTransactions">
+                      <h4 *ngFor="let trans of individualTransactions[item.key]">
                         {{trans}}
                       </h4>
                     </div>

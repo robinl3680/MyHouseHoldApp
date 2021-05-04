@@ -18,7 +18,7 @@ export class PurchaseDetailsComponent implements OnInit {
   fetChMode: boolean = true;
   searchMode: boolean = false;
   groupName: string;
-  individualTransactions = [];
+  individualTransactions = {};
   constructor(private purchaseService: PurchaseDetailsService,
     private itemService: ItemsService, 
     private router: Router,
@@ -58,11 +58,16 @@ export class PurchaseDetailsComponent implements OnInit {
 
 
   populateIndividualTransaction() {
+    this.individualTransactions = [];
     for(let item of this.retrievedItems) {
       if(item.multiPerson) {
         const keys = Object.keys(item.individualTransaction);
         for(let key of keys) {
-          this.individualTransactions.push(key + ': ' + item.individualTransaction[key]);
+          if(this.individualTransactions[item.key]) {
+            this.individualTransactions[item.key].push(key + ': ' + item.individualTransaction[key]);
+          } else {
+            this.individualTransactions[item.key] = [key + ': ' + item.individualTransaction[key]];
+          }
         }
       }
     }
