@@ -8,7 +8,6 @@ import { StatusCodes } from 'http-status-codes';
 import { ActivatedRoute, Data } from '@angular/router';
 import { AuthService } from '../app-auth/auth.service';
 import { ItemDetails } from '../items.model';
-import { ThemeService } from 'ng2-charts';
 
 @Component({
   selector: 'app-purchase-form',
@@ -96,7 +95,7 @@ export class PurchaseFormComponent implements OnInit {
     for(const person of this.persons) {
       this.multiSelectCheckBoxInfo[person.name] = true;
     }
-    if(this.id) {
+    if(this.id && this.formData.multiPerson) {
       this.onModelChangeMultiPeopleEachValueEntered();
     }
   }
@@ -160,7 +159,6 @@ export class PurchaseFormComponent implements OnInit {
   onModelChange() {
     this.isSuccess = false;
     this.enableClear = true;
-    //this.distrubuiteAmountEqualy();
   };
 
   onModelChangeAmount() {
