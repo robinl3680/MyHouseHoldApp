@@ -79,13 +79,13 @@
               <div class="col-md-5" *ngIf="multiSelect">
                 <div name="person"  *ngFor="let person of persons; let i = index">
                   <label for="eachName">{{person.name}}</label>
-                  <input style="margin-left: 5px;" type="checkbox" name="individualCheck" (click)="onModelChangeMultiSelectEachCheck(person.name, $event.target.checked)">
-                  <input type="text" class="form-control" ngModel [name]="person.name" *ngIf="multiSelectCheckBoxInfo[person.name]" (ngModelChange)="onModelChangeMultiPeopleEachValueEntered()">
+                  <input style="margin-left: 5px;" type="checkbox" [name]="person.name + 'Check'" [(ngModel)]="multiSelectCheckBoxInfo[person.name]" (ngModelChange)="onModelChangeIndividualCheck()">
+                  <input type="text" class="form-control" [name]="person.name" [(ngModel)]="individualTransactions[person.name]" *ngIf="multiSelectCheckBoxInfo[person.name]" (ngModelChange)="onModelChangeMultiPeopleEachValueEntered()">
                 </div>
               </div>
               <div class="col-md-3">
                 <label for="multiPerson">Multiple People</label>
-                <input style="margin-left: 5px;" type="checkbox" name="multiPerson" (click)="onMultiSelectOption($event.target.checked)">
+                <input style="margin-left: 5px;" type="checkbox" name="multiPerson" ngModel (ngModelChange)="onMultiSelectChanged()">
               </div>
             </div>
           </div>

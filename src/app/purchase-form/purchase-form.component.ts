@@ -8,6 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ActivatedRoute, Data } from '@angular/router';
 import { AuthService } from '../app-auth/auth.service';
 import { ItemDetails } from '../items.model';
+import { ThemeService } from 'ng2-charts';
 
 @Component({
   selector: 'app-purchase-form',
@@ -28,6 +29,8 @@ export class PurchaseFormComponent implements OnInit {
   multiSelectCheckBoxInfo = {};
   disableSubmitOnMultiSelect = false;
   totalCost = 0;
+  individualTransactions = {};
+  onceModified = false;
 
   groupName: string;
   @ViewChild('form') form: NgForm;
@@ -45,6 +48,9 @@ export class PurchaseFormComponent implements OnInit {
       this.formData = this.purchaseService.onModifyEntry(this.id);
       if (this.formData) {
         this.itemType = this.formData.item;
+        if(this.formData.multiPerson) {
+          this.multiSelect = true;
+        }
       }
     })
 
@@ -58,6 +64,7 @@ export class PurchaseFormComponent implements OnInit {
       this.personService.fetchPersonDetails(this.groupName)
         .subscribe((persons: Person[]) => {
           this.persons = persons;
+          this.setMultiSelectCheckBoxInfo();
         });
        
       this.onFetchData();
@@ -68,7 +75,11 @@ export class PurchaseFormComponent implements OnInit {
         if (this.formData) {
           this.form.value.personsDistributedAmounts='';
           this.itemService.eachPersonsDeatils.next(this.formData);
-          this.form.setValue(this.formData);
+          if(!this.multiSelect) {
+            this.form.setValue(this.formData);
+          } else {
+            this.setIndividualTransactionOnModify();
+          }
         } else {
           this.error = "Data can't be loaded!!";
         }
@@ -80,6 +91,27 @@ export class PurchaseFormComponent implements OnInit {
     });
     
   };
+
+  setMultiSelectCheckBoxInfo() {
+    for(const person of this.persons) {
+      this.multiSelectCheckBoxInfo[person.name] = true;
+    }
+    if(this.id) {
+      this.onModelChangeMultiPeopleEachValueEntered();
+    }
+  }
+
+  setIndividualTransactionOnModify() {
+    this.form.value.person = '';
+    for(let key in this.formData.individualTransaction) {
+      this.form.value[key] = '';
+      this.individualTransactions[key] = this.formData.individualTransaction[key];
+      this.multiSelectCheckBoxInfo[key] = true;
+    }
+    delete this.formData.person;
+    delete this.formData.individualTransaction;
+    this.form.setValue(this.formData);
+  }
 
   onFetchData() {
     this.itemService.fetchData(this.groupName)
@@ -133,8 +165,9 @@ export class PurchaseFormComponent implements OnInit {
 
   onModelChangeAmount() {
     this.onModelChange();
-    if(this.id) {
+    if(this.id && !this.onceModified) {
       this.personService.costEntered.next(this.formData);
+      this.onceModified = true;
     } else {
       this.personService.costEntered.next(this.form.value);
     }
@@ -151,21 +184,32 @@ export class PurchaseFormComponent implements OnInit {
     }
   };
 
-  onMultiSelectOption(checked) {
-    this.multiSelect = checked;
-    this.disableSubmitOnMultiSelect = checked;
-    this.multiSelectCheckBoxInfo = {};
+  onMultiSelectChanged() {
+    const self = this;
+    this.multiSelect = this.form.controls["multiPerson"].value;
+    this.disableSubmitOnMultiSelect = this.form.controls["multiPerson"].value;
+    if(this.id) {
+      for (const key in this.individualTransactions) {
+        this.form.value[key] = this.individualTransactions[key];
+        this.multiSelectCheckBoxInfo[key] = true;
+      }
+    }
   }
 
-  onModelChangeMultiSelectEachCheck(name, checked) {
-    this.multiSelectCheckBoxInfo[name] = checked;
+  onModelChangeIndividualCheck() {
+    for(const key in this.individualTransactions) {
+      if(!this.multiSelectCheckBoxInfo[key]) {
+        this.individualTransactions[key] = 0;
+      }
+    }
+    this.onModelChangeMultiPeopleEachValueEntered();
   }
 
   onModelChangeMultiPeopleEachValueEntered() {
     this.totalCost = 0;
     for(let person of this.persons) {
       if(this.multiSelectCheckBoxInfo[person.name]) {
-        let cost = +this.form.value[person.name];
+        let cost = this.id ? ( +this.individualTransactions[person.name] ? +this.individualTransactions[person.name] : 0 ) : +this.form.value[person.name];
         this.totalCost += cost;
       }
     }

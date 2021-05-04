@@ -42,8 +42,10 @@ export class PurchaseDetailsService {
                 date: item.date,
                 item: item.item,
                 amount: item.amount,
-                  person: item.person,
-                  personsDistributedAmounts:item.personsDistributedAmounts,
+                person: item.person,
+                personsDistributedAmounts:item.personsDistributedAmounts,
+                multiPerson: item.multiPerson,
+                individualTransaction: item.individualTransaction
                 //   details: item.details
               });
             }
