@@ -128,6 +128,7 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
 
   navigateToGroup(item: groupMapping) {
     this.router.navigate(['/purchase-form/' + item.key]);
+    this.groupService.setCurrentGroupId(item.key);
     this.groupService.groupSubject.next(item.key);
   }
 

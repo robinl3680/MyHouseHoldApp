@@ -8,6 +8,7 @@ import { PersonService } from './person.service';
 import { StatusCodes } from 'http-status-codes';
 import { PurchaseDetailsService } from './purchase-details.service';
 import { AuthService } from './app-auth/auth.service';
+import { UserGroupService } from './handle-user-groups/handle-user-groups.service';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +16,11 @@ import { AuthService } from './app-auth/auth.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private groupService: UserGroupService) {
 
   }
  ngOnInit() {
    this.authService.autoLogin();
+   this.groupService.autoLoadGroupId();
  }
 }

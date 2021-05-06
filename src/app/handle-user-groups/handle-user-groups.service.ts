@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
-import { Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { catchError, map, tap } from "rxjs/operators";
 import { AuthService } from "../app-auth/auth.service";
 
@@ -20,9 +20,10 @@ export class UserGroupService implements OnDestroy {
     groupNames: string[] = [];
     currentUserPath: string;
     groupIdGroupMapping: groupMapping[] = [];
-    groupSubject = new Subject<string>();
+    groupSubject = new BehaviorSubject<string>(null);
     alertSubject = new Subject<string>();
     groupNamesLoaded = new Subject<boolean>();
+    currentGroupId: string;
     constructor(private http: HttpClient, private authService: AuthService) {
         
     }
@@ -264,6 +265,18 @@ export class UserGroupService implements OnDestroy {
                 });
             }
         });
+    }
+
+    setCurrentGroupId(groupName: string) {
+        this.currentGroupId = groupName;
+        localStorage.setItem('groupId', this.currentGroupId);
+    }
+
+    autoLoadGroupId() {
+        this.currentGroupId = localStorage.getItem('groupId');
+        if(this.currentGroupId) {
+            this.groupSubject.next(this.currentGroupId);
+        }
     }
 
     ngOnDestroy() {
