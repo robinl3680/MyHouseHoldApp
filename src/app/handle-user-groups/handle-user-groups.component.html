@@ -76,7 +76,7 @@
             <div class="col col-md-4">
                 <a type="button" style="text-decoration: none; cursor: pointer;" (click)="showGroups()">Show my gorups</a>
             </div>
-            <div *ngIf="alert">
+            <div *ngIf="isJoinMode && alert">
                 <div class="alert alert-warning">{{alert}}</div>
             </div>
             <form #groupForm="ngForm">
