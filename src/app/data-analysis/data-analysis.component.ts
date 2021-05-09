@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as Chart from 'chart.js';
 import { PurchaseDetailsService } from '../purchase-details.service';
 import { ItemDetails } from '../items.model';
@@ -36,6 +36,19 @@ export class DataAnalysisComponent implements OnInit {
     'onClick': this.handleOnClickLegendForPersonChart.bind(this),
     cutoutPercentage: 0
   };
+
+  public lineChartOptions = {
+    tooltips: {
+      callbacks: {
+        label: this.lineChartCallback.bind(this),
+        // footer: function (tooltipItems, data) {
+        //   return ['new line', 'another line'];
+        // }
+      },
+      
+    }
+  }
+
   public backgroundColor = ['rgba(0, 0, 225, 1)', 'rgba(255, 0, 0, 1)', 'rgba(51, 204, 0, 1)', 'rgba(204, 0, 204, 1)', 'rgba(255, 153, 0, 1)', 'rgba(255, 0, 102, 1)'];
   private itemDetails: ItemDetails[] = [];
   public pieChartColors = [
@@ -45,6 +58,7 @@ export class DataAnalysisComponent implements OnInit {
   ];
 
   public chartMode: string = '';
+  private sortedDataSet: ItemDetails[];
 
   ngOnInit(): void {
     Chart.defaults.scale.gridLines.drawOnChartArea = false;
@@ -72,6 +86,7 @@ export class DataAnalysisComponent implements OnInit {
   private getLineChartData() {
     this.filterService.setDirectionandOption('Date of Purchase', 'Ascending');
     let filteredData = this.filterService.sortData(this.itemDetails.slice());
+    this.sortedDataSet = filteredData;
     let labels = [];
     let data = {};
     for (let item of filteredData) {
@@ -166,6 +181,52 @@ export class DataAnalysisComponent implements OnInit {
     const clickedIndex = data[0]._index;
     const label = data[0]._chart.data.labels[clickedIndex];
     return label;
+  }
+
+
+  private findLabel(xLabel, yLabel, dataSetIndex) {
+    let label = '';
+    if (yLabel === 0) {
+      return this.lineChartData[dataSetIndex].label + ' Cost : 0';
+    } else {
+      for(let item of this.sortedDataSet) {
+        if (item.date === xLabel && item.amount === +yLabel && this.lineChartData[dataSetIndex].label === item.item) {
+          label = label + item.item + ' ' + 'Total Cost: ' + item.amount + '\n';
+          if(item.multiPerson) {
+            for(let p in item.individualTransaction) {
+              label =  label + p + ': ' + item.individualTransaction[p] + '\n';
+            }
+          } else {
+            label = label + item.person + ': ' + item.amount + '\n';
+          }
+        }
+      }
+    }
+    return label;
+  }
+
+
+  private getFooter(xLabel, yLabel) {
+    let label = '';
+    for (let item of this.sortedDataSet) {
+      if (item.date === xLabel && item.amount === +yLabel) {
+        label = label + item.item + ' ' + 'Total Cost: ' + item.amount + '\n';
+        if (item.multiPerson) {
+          for (let p in item.individualTransaction) {
+            label = label + p + ': ' + item.individualTransaction[p] + '\n';
+          }
+        } else {
+          label = label + item.person + ': ' + item.amount + '\n';
+        }
+      }
+    }
+  }
+
+
+  private lineChartCallback(context) {
+    let label = this.findLabel(context.xLabel, context.yLabel, context.datasetIndex);
+    let labels = label.split('\n');
+    return labels.length > 1 ? labels.splice(0, labels.length - 1) : labels;
   }
 
 }
