@@ -13,13 +13,13 @@ import { FilterService } from '../filter-component/filter.service';
 })
 export class DataAnalysisComponent implements OnInit {
 
-  constructor(private purchaseService: PurchaseDetailsService, 
+  constructor(private purchaseService: PurchaseDetailsService,
     private router: Router,
     private route: ActivatedRoute,
-    private filterService: FilterService) { 
+    private filterService: FilterService) {
 
   }
-
+  error: string;
   public itemChartLabels: string[] = [];
   public itemChartData: number[] = [];
   public personChartLabels: string[] = [];
@@ -27,9 +27,15 @@ export class DataAnalysisComponent implements OnInit {
   public lineChartData: Chart.ChartDataSets[] = [];
   public lineChartLabels: Label[] = [];
 
+  loadChartDataFlag: boolean;
+  invalidDatesErrorFlag: boolean;
+  getHistoryDate: boolean = false;
+  public transactionFromDate: Date;
+  public transactionToDate: Date;
+
   public pieChartType = 'doughnut';
   public itemChartOptions = {
-    'onClick' : this.handleOnClickLegendForItemChart.bind(this),
+    'onClick': this.handleOnClickLegendForItemChart.bind(this),
     cutoutPercentage: 0
   };
   public personChartOptions = {
@@ -45,7 +51,7 @@ export class DataAnalysisComponent implements OnInit {
         //   return ['new line', 'another line'];
         // }
       },
-      
+
     }
   }
 
@@ -66,11 +72,18 @@ export class DataAnalysisComponent implements OnInit {
     this.populateChartData();
   }
 
-  private populateChartData() {
+  private populateChartData(chartDataOndateRange?) {
     let itemDataMap = {};
     let personDataMap = {};
-    this.getChartData(itemDataMap, personDataMap);
-    let lineDataset = this.getLineChartData();
+    let lineDataset;
+
+    if (chartDataOndateRange) {
+      this.getChartData(itemDataMap, personDataMap, chartDataOndateRange);
+      lineDataset = this.getLineChartData(chartDataOndateRange);
+    } else {
+      this.getChartData(itemDataMap, personDataMap);
+      lineDataset = this.getLineChartData();
+    }
     this.lineChartLabels = lineDataset.labels;
     this.populateLineChartData(lineDataset);
     for (let key in itemDataMap) {
@@ -83,10 +96,17 @@ export class DataAnalysisComponent implements OnInit {
     }
   }
 
-  private getLineChartData() {
+  private getLineChartData(dataFromDateRange?: ItemDetails[]) {
+    let filteredData;
     this.filterService.setDirectionandOption('Date of Purchase', 'Ascending');
-    let filteredData = this.filterService.sortData(this.itemDetails.slice());
-    this.sortedDataSet = filteredData;
+    if (this.getHistoryDate === false) {
+      filteredData = this.filterService.sortData(this.itemDetails.slice());
+      this.sortedDataSet = filteredData;
+    } else {
+      filteredData = this.filterService.sortData(dataFromDateRange.slice());
+      this.sortedDataSet = filteredData;
+    }
+
     let labels = [];
     let data = {};
     for (let item of filteredData) {
@@ -130,22 +150,38 @@ export class DataAnalysisComponent implements OnInit {
         }
       }
       let tempObj = {};
-      tempObj['data'] = tempData;
-      tempObj['label'] = key;
-      this.lineChartData.push(tempObj);
+      if (this.getHistoryDate === true) {
+        return this.lineChartData.find((elem) => {
+          if (elem.data === tempData && elem.label === key) {
+            tempObj['data'] = '';
+            tempObj['label'] = '';
+          }
+        })
+      } else {
+        tempObj['data'] = tempData;
+        tempObj['label'] = key;
+        this.lineChartData.push(tempObj);
+      }
+
     }
   }
 
-  private getChartData(itemDataMap, personDataMap) {
-    for (let item of this.itemDetails) {
+  private getChartData(itemDataMap, personDataMap, chartDataOndateRange?: ItemDetails[]) {
+    let sampleOfItemDetails;
+    if (this.getHistoryDate !== false) {
+      sampleOfItemDetails = chartDataOndateRange.slice();
+    } else {
+      sampleOfItemDetails = this.itemDetails.slice();
+    }
+    for (let item of sampleOfItemDetails) {
       if (itemDataMap[item.item]) {
         itemDataMap[item.item] += item.amount;
       } else {
         itemDataMap[item.item] = item.amount;
       }
-      if(item.multiPerson) {
-        for(let key in item.individualTransaction) {
-          if(personDataMap[key]) {
+      if (item.multiPerson) {
+        for (let key in item.individualTransaction) {
+          if (personDataMap[key]) {
             personDataMap[key] += +item.individualTransaction[key];
           } else {
             personDataMap[key] = +item.individualTransaction[key];
@@ -162,18 +198,18 @@ export class DataAnalysisComponent implements OnInit {
   }
 
   private handleOnClickLegendForItemChart(evt, data) {
-    if(data && data[0]) {
+    if (data && data[0]) {
       const label = this.commonHandlingForLegendClick(data);
       this.chartMode = 'item';
-      this.router.navigate(['detailed-data-view'], { relativeTo: this.route, queryParams: {item: label} });
+      this.router.navigate(['detailed-data-view'], { relativeTo: this.route, queryParams: { item: label } });
     }
   }
 
   private handleOnClickLegendForPersonChart(evt, data) {
-    if(data && data[0]) {
+    if (data && data[0]) {
       const label = this.commonHandlingForLegendClick(data);
       this.chartMode = 'person';
-      this.router.navigate(['detailed-data-view'], { relativeTo: this.route, queryParams: {person: label} });
+      this.router.navigate(['detailed-data-view'], { relativeTo: this.route, queryParams: { person: label } });
     }
   }
 
@@ -189,12 +225,12 @@ export class DataAnalysisComponent implements OnInit {
     if (yLabel === 0) {
       return this.lineChartData[dataSetIndex].label + ' Cost : 0';
     } else {
-      for(let item of this.sortedDataSet) {
+      for (let item of this.sortedDataSet) {
         if (item.date === xLabel && item.amount === +yLabel && this.lineChartData[dataSetIndex].label === item.item) {
           label = label + item.item + ' ' + 'Total Cost: ' + item.amount + '\n';
-          if(item.multiPerson) {
-            for(let p in item.individualTransaction) {
-              label =  label + p + ': ' + item.individualTransaction[p] + '\n';
+          if (item.multiPerson) {
+            for (let p in item.individualTransaction) {
+              label = label + p + ': ' + item.individualTransaction[p] + '\n';
             }
           } else {
             label = label + item.person + ': ' + item.amount + '\n';
@@ -227,6 +263,25 @@ export class DataAnalysisComponent implements OnInit {
     let label = this.findLabel(context.xLabel, context.yLabel, context.datasetIndex);
     let labels = label.split('\n');
     return labels.length > 1 ? labels.splice(0, labels.length - 1) : labels;
+  }
+
+  getPreviousData() {
+    this.getHistoryDate = true;
+    this.invalidDatesErrorFlag = false;
+    if (this.transactionToDate && this.transactionFromDate) {
+      if (this.transactionToDate < this.transactionFromDate) {
+        this.invalidDatesErrorFlag = true;
+        this.error = "* Invalid Date "
+        return;
+      }
+      let chartDataOndateRange: Array<ItemDetails> = [];
+      for (let data of this.itemDetails) {
+        if (data.date >= this.transactionFromDate && data.date <= this.transactionToDate) {
+          chartDataOndateRange.push(data);
+        }
+      }
+      this.populateChartData(chartDataOndateRange)
+    }
   }
 
 }
