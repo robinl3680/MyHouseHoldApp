@@ -5,6 +5,7 @@ import { ItemDetails } from '../items.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Label } from 'ng2-charts';
 import { FilterService } from '../filter-component/filter.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-data-analysis',
@@ -27,7 +28,7 @@ export class DataAnalysisComponent implements OnInit {
   public lineChartData: Chart.ChartDataSets[] = [];
   public lineChartLabels: Label[] = [];
 
-  loadChartDataFlag: boolean;
+  selectedFutureDateFlag: boolean = false;
   invalidDatesErrorFlag: boolean;
   getHistoryDate: boolean = false;
   public transactionFromDate: Date;
@@ -86,13 +87,15 @@ export class DataAnalysisComponent implements OnInit {
     }
     this.lineChartLabels = lineDataset.labels;
     this.populateLineChartData(lineDataset);
-    for (let key in itemDataMap) {
-      this.itemChartLabels.push(key);
-      this.itemChartData.push(itemDataMap[key]);
-    }
-    for (let key in personDataMap) {
-      this.personChartLabels.push(key);
-      this.personChartData.push(personDataMap[key]);
+    if (this.getHistoryDate === false) {
+      for (let key in itemDataMap) {
+        this.itemChartLabels.push(key);
+        this.itemChartData.push(itemDataMap[key]);
+      }
+      for (let key in personDataMap) {
+        this.personChartLabels.push(key);
+        this.personChartData.push(personDataMap[key]);
+      }
     }
   }
 
@@ -140,8 +143,11 @@ export class DataAnalysisComponent implements OnInit {
   }
 
   private populateLineChartData(lineDataset) {
+    this.lineChartData = [];
+    let chartColorIndex = 0;
     for (let key in lineDataset.data) {
       let tempData = [];
+     
       for (let date in lineDataset.data[key]) {
         if (lineDataset.data[key][date].length > 1) {
           tempData.push(lineDataset.data[key][date].reduce((a, b) => a + b, 0));
@@ -150,19 +156,16 @@ export class DataAnalysisComponent implements OnInit {
         }
       }
       let tempObj = {};
-      if (this.getHistoryDate === true) {
-        return this.lineChartData.find((elem) => {
-          if (elem.data === tempData && elem.label === key) {
-            tempObj['data'] = '';
-            tempObj['label'] = '';
-          }
-        })
-      } else {
-        tempObj['data'] = tempData;
-        tempObj['label'] = key;
-        this.lineChartData.push(tempObj);
+      tempObj['data'] = tempData;
+      tempObj['label'] = key;
+      if(this.backgroundColor[chartColorIndex]){
+        tempObj['borderColor'] = this.backgroundColor[chartColorIndex++];
       }
-
+      tempObj['fill'] = false;
+      this.lineChartData.push(tempObj);
+    }
+    if (this.lineChartData.length === 0) {
+      this.error = "No Transactions";
     }
   }
 

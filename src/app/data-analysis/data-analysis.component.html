@@ -8,13 +8,13 @@
     </div>
     <div class="row">
         <div [class]="'col col-md-4'">
-            <canvas [height]="200" baseChart [data]="itemChartData" [labels]="itemChartLabels" [chartType]="pieChartType"
-                [options]="itemChartOptions" [colors]="pieChartColors">
+            <canvas [height]="200" baseChart [data]="itemChartData" [labels]="itemChartLabels"
+                [chartType]="pieChartType" [options]="itemChartOptions" [colors]="pieChartColors">
             </canvas>
         </div>
         <div [class]="'col col-md-4'">
-            <canvas [height]="200" baseChart [title]="'Cost analysis'" [data]="personChartData" [labels]="personChartLabels"
-                [chartType]="pieChartType" [colors]="pieChartColors"
+            <canvas [height]="200" baseChart [title]="'Cost analysis'" [data]="personChartData"
+                [labels]="personChartLabels" [chartType]="pieChartType" [colors]="pieChartColors"
                 [options]="personChartOptions">
             </canvas>
         </div>
@@ -40,9 +40,12 @@
                         (ngModelChange)="getPreviousData()" placeholder="To" />
                 </div>
             </div>
-            <canvas [height]="100" [options]="lineChartOptions" baseChart [datasets]="lineChartData"
-                [labels]="lineChartLabels" chartType="line">
+
+            <h4 *ngIf="lineChartData.length === 0" class="alert alert-danger">{{error}}</h4>
+            <canvas [height]="100" [options]="lineChartOptions" baseChart
+                [datasets]="lineChartData" [labels]="lineChartLabels" chartType="line">
             </canvas>
+
         </div>
     </div>
 
