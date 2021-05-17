@@ -68,6 +68,9 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     this.isJoinMode = false;
     this.addItemsMode = false;
     this.isShowGroups = false;
+    this.updateOrDeleteItemsMode = false;
+    this.items = [];
+    this.itemsKey = [];
     this.error = null;
     this.alert = null;
   }
@@ -77,6 +80,9 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     this.isJoinMode = false;
     this.addItemsMode = false;
     this.isShowGroups = false;
+    this.updateOrDeleteItemsMode = false;
+    this.items = [];
+    this.itemsKey = [];
     this.error = null;
     this.alert = null;
   }
@@ -145,6 +151,9 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     this.isCreateMode = false;
     this.addItemsMode = false;
     this.isShowGroups = false;
+    this.updateOrDeleteItemsMode = false;
+    this.items = [];
+    this.itemsKey = [];
     this.error = null;
     this.alert = null;
   }
@@ -168,6 +177,9 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     this.isJoinMode = false;
     this.isCreateMode = false;
     this.addItemsMode = false;
+    this.updateOrDeleteItemsMode = false;
+    this.items = [];
+    this.itemsKey = [];
     this.error = null;
     this.alert = null;
     this.disableModifyGroupName();
@@ -179,12 +191,23 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     this.isCreateMode = false;
     this.isJoinMode = false;
     this.isShowGroups = false;
+    this.updateOrDeleteItemsMode = false;
+    this.items = [];
+    this.itemsKey = [];
     this.error = null;
     this.alert = null;
   }
 
   enableDeleteOrUpdate() {
     this.updateOrDeleteItemsMode = true;
+    this.addItemsMode = false;
+    this.isCreateMode = false;
+    this.isJoinMode = false;
+    this.isShowGroups = false;
+    this.items = [];
+    this.itemsKey = [];
+    this.error = null;
+    this.alert = null;
   }
 
   addItems(form: NgForm) {
@@ -244,6 +267,7 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
 
   onModelChangeForUpdateDeleteItem(data) {
     this.items = [];
+    this.itemsKey = [];
     const groupName = data.value['group-id'];
     if(groupName) {
       this.loadItems = true;
