@@ -115,7 +115,7 @@
             </form>
         </div>
     </div>
-    <div>
+    <div class="form-group">
         <div class="row">
             <div class="col col-md-4">
                 <a type="button" style="text-decoration: none; cursor: pointer;" (click)="enableAddItems()">Add items</a>
@@ -154,5 +154,44 @@
         <div *ngIf="alert && addItemsMode" class="alert alert-success">
             {{alert}}
         </div>
+        <div *ngIf="error && addItemsMode" class="alert alert-danger">
+            {{error}}
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col col-md-4">
+                <a type="button" style="text-decoration: none; cursor: pointer;" (click)="enableDeleteOrUpdate()">Delete/Update
+                    items</a>
+            </div>
+        </div>
+        <form #updateOrDeleteItem="ngForm" *ngIf="updateOrDeleteItemsMode">
+            <div class="row">
+                <div class="col col-md-2">
+                    <label for="group-id">Group name</label>
+                </div>
+                <div class="col col-md-4">
+                    <select class="form-control" name="group-id" ngModel (ngModelChange)="onModelChangeForUpdateDeleteItem(updateOrDeleteItem)">
+                        <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
+                    </select>
+                </div>
+                <div class="col col-md-4">
+                    <ul class="list-group" *ngIf="loadItems && items.length > 0">
+                        <li class="list-group-item" *ngFor="let item of items; let i = index">
+                            <input #itemData class="form-control" type="text" name="itemName" [value]="item" id="itemName">
+                            <div class="btn-toolbar">
+                                <button class="btn btn-danger" type="button" (click)="onDeleteItem(updateOrDeleteItem, i)">Delete</button>
+                                <button class="btn btn-primary" type="button" (click)="onUpdateItem(updateOrDeleteItem, i, itemData)">Update</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row" *ngIf="alert">
+                <div class="alert alert-success">
+                    {{ alert }}
+                </div>
+            </div>
+        </form>
     </div>
 </div>

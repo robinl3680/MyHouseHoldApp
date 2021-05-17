@@ -57,7 +57,7 @@ export class PurchaseFormComponent implements OnInit {
       this.groupName = data['id'];
       this.itemService.accessItems(this.groupName)
         .subscribe((items) => {
-          this.itemCategories = items;
+          this.itemCategories = items.itemArray;
         });
 
       this.personService.fetchPersonDetails(this.groupName)

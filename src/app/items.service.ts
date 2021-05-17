@@ -21,12 +21,14 @@ export class ItemsService {
                 .pipe(
                 map((items) => {
                     let itemArray: string[] = [];
+                    let itemKey: string[] = [];
                     for(const key in items) {
                         if(items.hasOwnProperty(key)) {
                             itemArray.push(items[key].itemName);
+                            itemKey.push(key);
                         }
                     }
-                    return itemArray;
+                    return {itemArray, itemKey};
                 })
         );
     }
@@ -65,4 +67,15 @@ export class ItemsService {
     deleteEntry(groupId: string, key: string) {
         return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData/' + key + '.json' );
     }
+
+    deleteItemEntry(groupId: string, itemId: string) {
+        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items/' + itemId + '.json');
+    }
+
+    updateItemEntry(groupId: string, itemId: string, itemName: string) {
+        return this.http.patch('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items/' + itemId + '.json', {
+            itemName: itemName
+        });
+    }
+
 }

@@ -1,8 +1,10 @@
 import { HttpClient } from "@angular/common/http";
+import { isNgContent } from "@angular/compiler";
 import { Injectable, OnDestroy } from "@angular/core";
-import { BehaviorSubject, Subject } from "rxjs";
-import { catchError, map, tap } from "rxjs/operators";
+import { BehaviorSubject, of, Subject } from "rxjs";
+import { catchError, exhaustMap, map, tap } from "rxjs/operators";
 import { AuthService } from "../app-auth/auth.service";
+import { ItemsService } from "../items.service";
 
 export interface groupMapping {
     key: string,
@@ -24,7 +26,8 @@ export class UserGroupService implements OnDestroy {
     alertSubject = new Subject<string>();
     groupNamesLoaded = new Subject<boolean>();
     currentGroupId: string;
-    constructor(private http: HttpClient, private authService: AuthService) {
+    constructor(private http: HttpClient, private authService: AuthService,
+        private itemService: ItemsService) {
         
     }
 
@@ -141,15 +144,21 @@ export class UserGroupService implements OnDestroy {
     }
 
     addItemsToGroup(groupId: string, item: string) {
-        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json', {
-            itemName: item
-        },
-        {
-            observe: 'response'
-        })
-            .pipe(catchError((errorResponse) => {
-            return this.authService.handleError(errorResponse, this.authService.errorSub);
-        }));
+        return this.itemService.accessItems(groupId).pipe(exhaustMap((items) => {
+            if(items.itemArray.indexOf(item) === -1) {
+                return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json', {
+                    itemName: item
+                },
+                    {
+                        observe: 'response'
+                    })
+                    .pipe(catchError((errorResponse) => {
+                        return this.authService.handleError(errorResponse, this.authService.errorSub);
+                    }));
+            } else {
+                return of(null);
+            }
+        }))
     }
 
     addPersonToGroup(groupId: string) {
