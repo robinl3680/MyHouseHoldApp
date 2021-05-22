@@ -225,18 +225,28 @@ export class DataAnalysisComponent implements OnInit {
 
   private findLabel(xLabel, yLabel, dataSetIndex) {
     let label = '';
+    let labelAmount = 0;
     if (yLabel === 0) {
       return this.lineChartData[dataSetIndex].label + ' Cost : 0';
     } else {
       for (let item of this.sortedDataSet) {
-        if (item.date === xLabel && item.amount === +yLabel && this.lineChartData[dataSetIndex].label === item.item) {
-          label = label + item.item + ' ' + 'Total Cost: ' + item.amount + '\n';
+        if (item.date === xLabel && this.lineChartData[dataSetIndex].label === item.item) {
+          labelAmount += item.amount;
+          if(label === '') {
+            label = label + item.item + ' ' + 'Total Cost: ' + labelAmount + '\n';
+          }
           if (item.multiPerson) {
             for (let p in item.individualTransaction) {
               label = label + p + ': ' + item.individualTransaction[p] + '\n';
             }
           } else {
             label = label + item.person + ': ' + item.amount + '\n';
+          }
+          if(labelAmount === +yLabel) {
+            let tempLabel = label.split('\n');
+            tempLabel[0] = item.item + ' ' + 'Total Cost: ' + labelAmount;
+            label = tempLabel.join('\n');
+            break;
           }
         }
       }

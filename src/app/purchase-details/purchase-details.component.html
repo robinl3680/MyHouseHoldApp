@@ -5,7 +5,7 @@
       </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-8">
           <div class="alert alert-info" *ngIf="fetChMode && !error">
             <app-loading-spinner></app-loading-spinner>Loading...
           </div>
@@ -34,6 +34,13 @@
               </li>
             </ul>
           </div>
+        </div>
+        <div class="col col-md-4">
+          <ul class="list-group">
+            <li class="list-group-item" *ngFor="let message of toBePaidInfo">
+              <h4>{{message}}</h4>
+            </li>
+          </ul>
         </div>
       </div>
       <router-outlet></router-outlet>    

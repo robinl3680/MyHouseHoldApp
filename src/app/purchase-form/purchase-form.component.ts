@@ -75,6 +75,7 @@ export class PurchaseFormComponent implements OnInit {
           this.form.value.personsDistributedAmounts='';
           this.itemService.eachPersonsDeatils.next(this.formData);
           if(!this.multiSelect) {
+            delete this.formData.individualTransaction;
             this.form.setValue(this.formData);
           } else {
             this.setIndividualTransactionOnModify();

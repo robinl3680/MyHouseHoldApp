@@ -5,6 +5,7 @@ import { ItemsService } from '../items.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../app-auth/auth.service';
 import { FilterService } from '../filter-component/filter.service';
+import { CoreLogicService } from '../core-logic.service';
 
 @Component({
   selector: 'app-purchase-details',
@@ -19,12 +20,14 @@ export class PurchaseDetailsComponent implements OnInit {
   searchMode: boolean = false;
   groupName: string;
   individualTransactions = {};
+  toBePaidInfo = [];
   constructor(private purchaseService: PurchaseDetailsService,
     private itemService: ItemsService, 
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private filterService: FilterService) {
+    private filterService: FilterService,
+    private coreService: CoreLogicService) {
 
   }
 
@@ -80,6 +83,10 @@ export class PurchaseDetailsComponent implements OnInit {
       this.retrievedItems = items;
       this.populateIndividualTransaction();
       this.fetChMode = false;
+      this.coreService.setItemDetails(this.retrievedItems, this.groupName);
+      this.coreService.getToBepaidInfoSubj.subscribe(info => {
+        this.toBePaidInfo = info;
+      });
     }, (errorMessage: string) => {
       this.error = errorMessage;
       this.fetChMode = false;

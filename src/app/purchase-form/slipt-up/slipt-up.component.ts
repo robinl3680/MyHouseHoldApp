@@ -64,7 +64,7 @@ export class SliptUpComponent implements OnInit {
     let contributedPeopleNames = contributedPeople.map(person => {
       return person.personsName;
     });
-    if (contributedPeopleNames.indexOf(this.persons[index].name) > -1 && contributedPeople[index].amountOfEachPersons > 0) {
+    if (contributedPeopleNames.indexOf(this.persons[index].name) > -1 ) {
       this.checkBoxInfo[index] = true;
     } else {
       this.checkBoxInfo[index] = false;
@@ -98,12 +98,14 @@ export class SliptUpComponent implements OnInit {
   pushPersonsIndividualDetails(){
     let purchaseDetails = [];
     for(let index in this.persons){
-      purchaseDetails.push(
-        {
-          personsName: this.persons[index].name, 
-          amountOfEachPersons: this.checkBoxInfo[index] ? this.individualSum : 0
-        }
-      )
+      if (this.checkBoxInfo[index]) {
+        purchaseDetails.push(
+          {
+            personsName: this.persons[index].name,
+            amountOfEachPersons: this.individualSum
+          }
+        )
+      }
     }
     this.purchaseDetailsService.setIndividualPurchaseDetails(purchaseDetails);
   }
