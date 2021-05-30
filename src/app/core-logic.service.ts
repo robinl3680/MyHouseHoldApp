@@ -52,7 +52,8 @@ export class CoreLogicService {
           const totalContributors = item.personsDistributedAmounts.length;
           for (let distribution of item.personsDistributedAmounts) {
             const personsName = distribution.personsName;
-            const personAmount = individualAmount / totalContributors;
+            const percentageOfContribution = ( distribution.amountOfEachPersons / item.amount ); 
+            const personAmount = individualAmount * percentageOfContribution;
             const indexOfCurrentPerson = this.persons.indexOf(personsName);
             if (indexOfCurrentPerson !== individualIndex) {
               this.directedGraph[indexOfCurrentPerson][individualIndex] += personAmount;
@@ -61,7 +62,6 @@ export class CoreLogicService {
         }
       }
     }
-    console.log(this.directedGraph);
   }
 
   private calculateNetAmount() {
@@ -72,7 +72,7 @@ export class CoreLogicService {
         netAmount[fromPerson] += (this.directedGraph[toPerson][fromPerson] - this.directedGraph[fromPerson][toPerson]);
       }
     }
-    console.log(netAmount);
+    this.toBePaidInfo = {};
     this.findEachToBePaid(netAmount);
   }
 
