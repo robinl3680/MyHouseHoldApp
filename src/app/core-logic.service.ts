@@ -119,6 +119,7 @@ export class CoreLogicService {
       this.toBePaidInfo[personToGetPaid] = {};
       this.toBePaidInfo[personToGetPaid][personToPay] = minValue;
     }
+    netAmount = netAmount.map((a) => Math.round(a));
     this.findEachToBePaid(netAmount);
   }
 
