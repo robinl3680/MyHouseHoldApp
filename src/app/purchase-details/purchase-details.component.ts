@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../app-auth/auth.service';
 import { FilterService } from '../filter-component/filter.service';
 import { CoreLogicService } from '../core-logic.service';
+import { NgForm } from '@angular/forms';
+import { StatusCodes } from 'http-status-codes';
 
 @Component({
   selector: 'app-purchase-details',
@@ -92,6 +94,30 @@ export class PurchaseDetailsComponent implements OnInit {
       this.fetChMode = false;
     });
   };
+
+  onSettleDebt(paidInfo: {sender: string, receiver: string, amount: number}, index: number) {
+     let form:  ItemDetails = {
+       amount : paidInfo.amount,
+       date : new Date().toISOString().split('T')[0],
+       item: 'Debt Settle',
+       key: this.groupName,
+       multiPerson: false,
+       person: paidInfo.sender,
+       personsDistributedAmounts: [{
+         amountOfEachPersons: paidInfo.amount,
+         personsName: paidInfo.receiver
+       }]
+     };
+    this.itemService.pushItems(this.groupName, form)
+      .subscribe((response) => {
+        if (response.status === StatusCodes.OK) {
+          this.onFetchData();
+        }
+      }), (errorMessage: string) => {
+        this.purchaseService.setError(errorMessage);
+      };
+     //this.toBePaidInfo.splice(index, 1);
+  }
 
   onModifyEntry(key: string) {
     this.router.navigate(['purchase-form/' + this.groupName], {queryParams: {itemKey: key}});

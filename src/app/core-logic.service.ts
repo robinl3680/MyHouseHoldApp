@@ -127,8 +127,10 @@ export class CoreLogicService {
     let returnVal = [];
     for(let item in this.toBePaidInfo) {
       for(let key in this.toBePaidInfo[item]) {
-        const message = `${key} has to pay ${this.toBePaidInfo[item][key]} to ${item}`;
-        returnVal.push(message);
+        const toBePaidObj = { sender: key, receiver: item, amount: Math.round(this.toBePaidInfo[item][key]) };
+        if(this.toBePaidInfo[item][key] > 0.1) {
+          returnVal.push(toBePaidObj);
+        }
       }
     }
     this.getToBepaidInfoSubj.next(returnVal);

@@ -37,8 +37,9 @@
         </div>
         <div class="col col-md-4">
           <ul class="list-group">
-            <li class="list-group-item" *ngFor="let message of toBePaidInfo">
-              <h4>{{message}}</h4>
+            <li class="list-group-item" *ngFor="let info of toBePaidInfo; let i = index">
+              <h4> {{ info.sender }} has to pay {{ info.amount }} to {{ info.receiver }} </h4>
+              <button class="btn btn-primary" type="button" (click)="onSettleDebt(info, i)">Setlle Debt</button>
             </li>
           </ul>
         </div>

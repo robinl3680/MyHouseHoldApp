@@ -2,7 +2,7 @@
 export interface ItemDetails {
     item: string,
     amount: number,
-    date: Date,
+    date: Date | string,
     person: string,
     key?: string,
     personsDistributedAmounts: PersonsDistributedAmounts[],

@@ -11,13 +11,13 @@
                 <a [routerLink]="['groups-view']">Group view</a>
             </li>
             <li [routerLinkActive]="'active'" *ngIf="isAuthenticated && groupName">
-                <a  [routerLink]="['purchase-form/' + groupName]">Purchase Form</a>
+                <a  [routerLink]="['purchase-form/', groupName]">Purchase Form</a>
             </li>
             <li [routerLinkActive]="'active'" *ngIf="isAuthenticated && groupName">
-                <a [routerLink]="['purchase-details/' + groupName]">Purchase Details</a>
+                <a [routerLink]="['purchase-details/', groupName]">Purchase Details</a>
             </li>
             <li [routerLinkActive]="'active'" *ngIf="isAuthenticated && groupName">
-                <a [routerLink]="['data-analysis/' + groupName]">Data Analysis</a>
+                <a [routerLink]="['data-analysis/', groupName]">Data Analysis</a>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
