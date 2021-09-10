@@ -46,18 +46,27 @@ export class UserGroupService implements OnDestroy {
     }
 
     createNewGroup(groupName) {
-        this.loadCurrentUserPath();
-        return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '.json', 
-        {
-            groupName: groupName
-        },
-            {
-                observe: 'response'
-            })
-            .pipe(catchError((errorResponse) => {
-                return this.authService.handleError(errorResponse, this.authService.errorSub);
-            }));
-        }
+        // this.loadCurrentUserPath();
+        // return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '.json', 
+        // {
+        //     groupName: groupName
+        // },
+        //     {
+        //         observe: 'response'
+        //     })
+        //     .pipe(catchError((errorResponse) => {
+        //         return this.authService.handleError(errorResponse, this.authService.errorSub);
+        //     }));
+
+        this.http.post('http://localhost:3300/groups/create', {
+            name: groupName
+        }).pipe(
+            catchError(errorResponse => {
+            return this.authService.handleError(errorResponse, this.authService.errorSub);
+        })).subscribe((data) => {
+            console.log(data);
+        });
+    }
 
     addGroupToUserProfile(groupId: string, groupName: string) {
         this.loadCurrentUserPath();
@@ -92,14 +101,40 @@ export class UserGroupService implements OnDestroy {
     }
 
     fetchGroup() {
-        this.loadCurrentUserPath();
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
+        // this.loadCurrentUserPath();
+        // return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
+        //     .pipe(
+        //         tap(this.handleUserGroups.bind(this)),
+        //         catchError((errorResponse) => {
+        //             return this.authService.handleError(errorResponse, this.authService.errorSub);
+        //         })
+        //     );
+        return this.fetchGroupFromNode();
+    }
+
+
+    fetchGroupFromNode() {
+        return this.http.get('http://localhost:3300/groups/getAll')
             .pipe(
-                tap(this.handleUserGroups.bind(this)),
-                catchError((errorResponse) => {
-                    return this.authService.handleError(errorResponse, this.authService.errorSub);
+                tap(this.handleUserGroupsFromNode.bind(this)),
+                catchError(err => {
+                    return this.authService.handleError(err, this.authService.errorSub);
                 })
             );
+    }
+
+    handleUserGroupsFromNode(groupDetails) {
+        this.groupNames = [];
+        this.groupIdGroupMapping = [];
+        if(groupDetails.groups) {
+            for(let index = 0; index < groupDetails.groups.length; index++) {
+                this.groupNames.push(groupDetails.groups[index]['name']);
+                const group: groupMapping = { key: groupDetails.groups[index]._id, groupName: groupDetails.groups[index]['name'], creator: groupDetails.groups[index]['creator'] };
+                this.groupIdGroupMapping.push(group);
+                //console.log(groupDetails.groups)
+            }
+            this.groupNamesLoaded.next(true);
+        }
     }
 
     

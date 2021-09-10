@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -36,7 +37,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   itemsKey: string[];
   constructor(private groupService: UserGroupService,
     private router: Router, private authService: AuthService,
-    private itemService: ItemsService) { 
+    private itemService: ItemsService,
+    private http: HttpClient) { 
 
   }
   ngOnInit(): void {
@@ -90,15 +92,18 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   onSubmitCreateGroup(form: NgForm) {
     const groupName = form.value['group-name'];
     if(this.groupNames.indexOf(groupName) === -1) {
-      this.groupService.createNewGroup(groupName).subscribe((response) => {
-        this.uniqueId = response.body['name'];
-        this.groupNames.push(groupName);
-        this.groupService.addPersonToGroup(this.uniqueId);
-        this.groupService.addGroupNameToGroupId(this.uniqueId, groupName).subscribe();
-        this.groupService.addGroupToUserProfile(this.uniqueId, groupName).subscribe((response) => {
-          this.groupService.deleteUnnecessaryData(this.uniqueId);
-        });
-      });
+
+      this.groupService.createNewGroup(groupName);
+
+      // this.groupService.createNewGroup(groupName).subscribe((response) => {
+      //   this.uniqueId = response.body['name'];
+      //   this.groupNames.push(groupName);
+      //   this.groupService.addPersonToGroup(this.uniqueId);
+      //   this.groupService.addGroupNameToGroupId(this.uniqueId, groupName).subscribe();
+      //   this.groupService.addGroupToUserProfile(this.uniqueId, groupName).subscribe((response) => {
+      //     this.groupService.deleteUnnecessaryData(this.uniqueId);
+      //   });
+      // });
     } else {
       this.error = "This group is already there !!";
     }

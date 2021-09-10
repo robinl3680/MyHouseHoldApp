@@ -30,6 +30,7 @@ export class AuthComponent implements OnInit {
     onSubmit(form: NgForm) {
         const email = form.value.email;
         const password = form.value.password;
+        const confirmPassword = form.value['repeat-password'];
         const phone = form.value.phone;
         const userName = form.value['user-name'];
         this.isLoading = true;
@@ -48,7 +49,7 @@ export class AuthComponent implements OnInit {
             
         } 
         else {
-            this.authService.signUp(email, password, userName, phone);
+            this.authService.signUp(email, password, confirmPassword, userName, phone);
             this.authService.emailVerifyAlert.subscribe((alert) => {
                 this.alert = alert;
                 form.reset();

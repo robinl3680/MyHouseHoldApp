@@ -23,8 +23,10 @@ export class CoreLogicService {
       this.persons = persons.map(person => person.name);
       this.directedGraph = [...Array(persons.length)].map(e => Array(persons.length).fill(0));
       this.constructDirectedGraph();
-      this.calculateNetAmount();
-      this.getToBePaidInfo();
+      if(this.directedGraph.length > 0) {
+        this.calculateNetAmount();
+        this.getToBePaidInfo();
+      }
     });
   }
 
