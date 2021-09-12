@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { isNgContent } from "@angular/compiler";
 import { Injectable, OnDestroy } from "@angular/core";
+import { Router } from "@angular/router";
 import { BehaviorSubject, of, Subject } from "rxjs";
 import { catchError, exhaustMap, map, tap } from "rxjs/operators";
 import { AuthService } from "../app-auth/auth.service";
@@ -126,17 +127,17 @@ export class UserGroupService implements OnDestroy {
     handleUserGroupsFromNode(groupDetails) {
         this.groupNames = [];
         this.groupIdGroupMapping = [];
-        if(groupDetails.groups) {
-            for(let index = 0; index < groupDetails.groups.length; index++) {
-                this.groupNames.push(groupDetails.groups[index]['name']);
-                const group: groupMapping = { key: groupDetails.groups[index]._id, groupName: groupDetails.groups[index]['name'], creator: groupDetails.groups[index]['creator'] };
-                this.groupIdGroupMapping.push(group);
-                //console.log(groupDetails.groups)
-            }
-            this.groupNamesLoaded.next(true);
+        let groups = groupDetails.groups;
+        for(let index = 0; index < groups.length; index++) {
+            const group = groups[index];
+            this.groupNames.push(group['name']);
+            const groupCreated: groupMapping = { key: group['_id'], groupName: group['name'], creator: group['creator'] };
+            this.groupIdGroupMapping.push(groupCreated);
+        }
+        if(groups.length === 0) {
+            this.alertSubject.next("You don't have any group currently !!");
         }
     }
-
     
     handleUserGroups(groupDetails) {
         this.groupNames = [];
@@ -179,22 +180,35 @@ export class UserGroupService implements OnDestroy {
     }
 
     addItemsToGroup(groupId: string, item: string) {
-        return this.itemService.accessItems(groupId).pipe(exhaustMap((items) => {
-            if(items.itemArray.indexOf(item) === -1) {
-                return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json', {
-                    itemName: item
-                },
-                    {
-                        observe: 'response'
-                    })
-                    .pipe(catchError((errorResponse) => {
-                        return this.authService.handleError(errorResponse, this.authService.errorSub);
-                    }));
-            } else {
-                return of(null);
-            }
-        }))
+        // return this.itemService.accessItems(groupId).pipe(exhaustMap((items) => {
+        //     if(items.itemArray.indexOf(item) === -1) {
+        //         return this.http.post('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json', {
+        //             itemName: item
+        //         },
+        //             {
+        //                 observe: 'response'
+        //             })
+        //             .pipe(catchError((errorResponse) => {
+        //                 return this.authService.handleError(errorResponse, this.authService.errorSub);
+        //             }));
+        //     } else {
+        //         return of(null);
+        //     }
+        // }))
+
+
+        return this.http.post('http://localhost:3300/groups/addItem', {
+            groupId: groupId,
+            item: item
+        })
+            .pipe(
+                catchError(err => {
+                    return this.authService.handleError(err, this.authService.errorSub);
+                })
+            );
+
     }
+
 
     addPersonToGroup(groupId: string) {
         this.authService.getUserInfo(this.authService.user.value.userUniqueId).subscribe((userInfo) => {
@@ -258,6 +272,17 @@ export class UserGroupService implements OnDestroy {
         return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '.json'); 
     }
 
+
+    deleteGroupFromNode(groupId: string) {
+        return this.http.delete(`http://localhost:3300/groups/delete/${groupId}`);
+    }
+
+    leaveGroupFromNode(groupId: string) {
+        return this.http.post('http://localhost:3300/groups/leave', {
+            groupId: groupId
+        });
+    }
+
     modifyGroupNameFromUser(groupId: string, groupName: string) {
         return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/userData/' + this.currentUserPath + '/groupDetails.json')
             .pipe(map((responseData) => {
@@ -308,6 +333,19 @@ export class UserGroupService implements OnDestroy {
                     });
                 });
             }
+        });
+    }
+
+    updateGroupNameFromNode(groupId: string, name: string) {
+        this.http.post('http://localhost:3300/groups/modifyName', {
+            groupId: groupId,
+            newName: name
+        }).subscribe();
+    }
+
+    joinGroupUsingNode(groupId: string) {
+        return this.http.post('http://localhost:3300/groups/join', {
+            groupId: groupId
         });
     }
 

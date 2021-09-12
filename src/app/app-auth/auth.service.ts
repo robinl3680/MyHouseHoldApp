@@ -214,6 +214,7 @@ export class AuthService {
         // }),
         //     tap(this.handleAuthentication.bind(this))).subscribe();
 
+
         this.http.post('http://localhost:3300/auth/login', {
             email: email,
             password: password

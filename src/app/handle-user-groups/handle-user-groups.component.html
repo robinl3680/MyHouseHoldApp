@@ -136,7 +136,7 @@
                         <label for="group-id">Group name</label>
                     </div>
                     <div class="col col-md-4">
-                        <select class="form-control" name="group-id" ngModel>
+                        <select class="form-control" name="group-id" [ngModel]="groupList[0].key">
                             <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
                         </select>
                     </div>

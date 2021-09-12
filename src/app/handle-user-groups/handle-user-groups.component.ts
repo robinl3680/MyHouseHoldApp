@@ -35,6 +35,7 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   loadItems: boolean;
   items: string[];
   itemsKey: string[];
+  selectedGroupId: string;
   constructor(private groupService: UserGroupService,
     private router: Router, private authService: AuthService,
     private itemService: ItemsService,
@@ -116,22 +117,33 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.error = "You already joined to this group!!";
       this.alert = null;
     } else {
-      this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
-        if (groupName) {
-          if (this.groupNames.indexOf(groupName) === -1) {
-            this.groupService.addPersonToGroup(groupId);
-            this.groupService.addGroupToUserProfile(groupId, groupName).subscribe();
-            this.alert = "You successfully joined to the new group!!";
-            this.error = null;
-          } else {
-            this.error = "You already joined to this group!!";
-            this.alert = null;
-          }
-        } else {
-          this.error = "No such group is there !!";
-          this.alert = null;
+    //   this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
+    //     if (groupName) {
+    //       if (this.groupNames.indexOf(groupName) === -1) {
+    //         this.groupService.addPersonToGroup(groupId);
+    //         this.groupService.addGroupToUserProfile(groupId, groupName).subscribe();
+    //         this.alert = "You successfully joined to the new group!!";
+    //         this.error = null;
+    //       } else {
+    //         this.error = "You already joined to this group!!";
+    //         this.alert = null;
+    //       }
+    //     } else {
+    //       this.error = "No such group is there !!";
+    //       this.alert = null;
+    //     }
+    //   });
+
+      this.groupService.joinGroupUsingNode(groupId)
+      .subscribe((group) => {
+        if(group) {
+          console.log(group);
+          this.alert = "You successfully joined to the new group!!";
+          this.error = null;
         }
       });
+
+
     }
   }
 
@@ -164,8 +176,12 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   }
 
   fetchAllGroups() {
-    this.groupService.fetchGroup().subscribe();
-    this.subscription = this.groupService.groupNamesLoaded.subscribe(this.handleGroupLoaded.bind(this));
+    this.groupService.fetchGroup().subscribe((data) => {
+      this.groupNames = this.groupService.getGroupNames;
+      this.groupList = this.groupService.getGroupIdgroupMapping;
+      this.leavingMode = false;
+    });
+    //this.subscription = this.groupService.groupNamesLoaded.subscribe(this.handleGroupLoaded.bind(this));
   }
 
   handleGroupLoaded(isLoaded) {
@@ -217,8 +233,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
 
   addItems(form: NgForm) {
     this.alert = null;
-    const groupId = form.value['group-id'];
     const item = form.value['item'];
+    const groupId = form.value['group-id'];
     this.groupService.addItemsToGroup(groupId, item).subscribe((response) => {
       if(response) {
         this.alert = "Item added successfully";
@@ -243,7 +259,10 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.error = null;
       this.leavingMode = true;
       this.isModificationMode = false;
-      this.groupService.modifyGroupName(key, newName);
+      // this.groupService.modifyGroupName(key, newName);
+
+      
+
     } else {
       this.error = "This group is already there !!";
     }
@@ -253,20 +272,35 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     if(creator === this.currentUser) { //Delete case
       if(confirm("Are sure want to delete ?")) {
         this.leavingMode = true;
-        this.groupService.deleteGroupNameFromUser(groupId).subscribe((responseData) => {
-          responseData.subscribe(() => {
-            this.groupService.deleteGroup(groupId).subscribe(() => {
-              this.fetchAllGroups();
-            });
-          });
+        // this.groupService.deleteGroupNameFromUser(groupId).subscribe((responseData) => {
+        //   responseData.subscribe(() => {
+        //     this.groupService.deleteGroup(groupId).subscribe(() => {
+        //       this.fetchAllGroups();
+        //     });
+        //   });
+        // });
+
+
+        this.groupService.deleteGroupFromNode(groupId)
+        .subscribe(res => {
+          this.fetchAllGroups();
         });
+
+
       }
     } else { //Leave case
       this.leavingMode = true;
-      this.groupService.deletePersonFromGroup(groupId);
-      this.groupService.deleteGroupNameFromUser(groupId).subscribe((response)=>{
-        response.subscribe();
+      // this.groupService.deletePersonFromGroup(groupId);
+      // this.groupService.deleteGroupNameFromUser(groupId).subscribe((response)=>{
+      //   response.subscribe();
+      // });
+
+
+      this.groupService.leaveGroupFromNode(groupId)
+      .subscribe(res => {
+        this.fetchAllGroups();
       });
+
     }
   }
 
@@ -278,25 +312,35 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.loadItems = true;
       this.itemService.accessItems(groupName).subscribe((items) => {
         this.items = items.itemArray;
-        this.itemsKey = items.itemKey;
+        //this.itemsKey = items.itemKey;
       });
     }
   }
 
   onDeleteItem(formData, index) {
-    if(confirm("Are sure want to delete ?")) {
+    // if(confirm("Are sure want to delete ?")) {
+    //   const groupId = formData.value['group-id'];
+    //   const itemKey = this.itemsKey[index];
+    //   this.itemService.deleteItemEntry(groupId, itemKey).subscribe(result => {
+    //     this.alert = "Item deleted successfully";
+    //     this.onModelChangeForUpdateDeleteItem(formData);
+    //   });
+    // }
+
+    if (confirm("Are sure want to delete ?")) {
       const groupId = formData.value['group-id'];
-      const itemKey = this.itemsKey[index];
+      const itemKey = this.items[index];
       this.itemService.deleteItemEntry(groupId, itemKey).subscribe(result => {
         this.alert = "Item deleted successfully";
         this.onModelChangeForUpdateDeleteItem(formData);
       });
     }
+
   }
 
   onUpdateItem(formData, index, itemData) {
     const groupId = formData.value['group-id'];
-    const itemKey = this.itemsKey[index];
+    const itemKey = this.items[index];
     const itemName = itemData.value;
     this.itemService.updateItemEntry(groupId, itemKey, itemName).subscribe(result => {
       this.alert = "Item updated successfully";
