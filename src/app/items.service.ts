@@ -47,7 +47,16 @@ export class ItemsService {
         .pipe(catchError((errorResponse) => {
             return this.authService.handleError(errorResponse, this.authService.errorSub);
         }));
-    }
+    };
+
+    pushItemsToNode(groupId: string, item: ItemDetails) {
+        return this.http.post('http://localhost:3300/transactions/newTransaction', {
+            groupId: groupId,
+            item: item
+        }).pipe(catchError((errorResponse) => {
+            return this.authService.handleError(errorResponse, this.authService.errorSub);
+        }));
+    };
 
     fetchData(groupId: string) {
         return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData.json')
@@ -70,8 +79,22 @@ export class ItemsService {
         );
     }
 
+    fetchDataFromNode(groupId: string) {
+        return this.http.get(`http://localhost:3300/transactions/${groupId}/getTransactions`)
+        .pipe(tap((itemsInfo: { message: string, items: ItemDetails[]}) => {
+            this.purchaseService.populatePurchaseItems(itemsInfo.items);
+        }),
+            catchError((errorResponse) => {
+                return this.authService.handleError(errorResponse, this.authService.errorSub);
+            }));
+    }
+
     deleteEntry(groupId: string, key: string) {
         return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData/' + key + '.json' );
+    }
+
+    deleteEntryFromNode(groupId: string, transactionId: string) {
+        return this.http.delete(`http://localhost:3300/transactions/${groupId}:${transactionId}/delete`);
     }
 
     deleteItemEntry(groupId: string, itemId: string) {

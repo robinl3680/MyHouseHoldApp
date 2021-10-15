@@ -60,11 +60,18 @@ export class PurchaseFormComponent implements OnInit {
           this.itemCategories = items.itemArray;
         });
 
-      this.personService.fetchPersonDetails(this.groupName)
-        .subscribe((persons: Person[]) => {
-          this.persons = persons;
+      // this.personService.fetchPersonDetails(this.groupName)
+      //   .subscribe((persons: Person[]) => {
+      //     this.persons = persons;
+      //     this.setMultiSelectCheckBoxInfo();
+      //   });
+
+      this.personService.fetchPersonDetailsFromNode(this.groupName)
+        .subscribe((response: { message: string, members: Person[]}) => {
+          this.persons = response.members;
+          console.log(this.persons);
           this.setMultiSelectCheckBoxInfo();
-        });
+      });
        
       this.onFetchData();
     });
@@ -145,16 +152,28 @@ export class PurchaseFormComponent implements OnInit {
   };
 
   pushDetailsToServer(form: NgForm) {
-    this.itemService.pushItems(this.groupName, form.value)
-      .subscribe((response) => {
-           if(response.status === StatusCodes.OK) {
-            this.onFetchData();
-            this.resetForm();
-            this.isSuccess = true;
-           }
+    // this.itemService.pushItems(this.groupName, form.value)
+    //   .subscribe((response) => {
+    //        if(response.status === StatusCodes.OK) {
+    //         this.onFetchData();
+    //         this.resetForm();
+    //         this.isSuccess = true;
+    //        }
+    //   }), (errorMessage: string) => {
+    //     this.purchaseService.setError(errorMessage);
+    //   }; 
+
+    this.itemService.pushItemsToNode(this.groupName, form.value)
+      .subscribe((response: {message: string, item: ItemDetails}) => {
+        if(response.item) {
+          //this.onFetchData();
+          this.resetForm();
+          this.isSuccess = true;
+        }
+        console.log(response);
       }), (errorMessage: string) => {
         this.purchaseService.setError(errorMessage);
-      };    
+      };
   };
 
   onModelChange() {

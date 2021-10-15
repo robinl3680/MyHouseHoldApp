@@ -26,5 +26,9 @@ export class PersonService {
             } 
         ));
     }
+
+    fetchPersonDetailsFromNode(groupId: string) {
+        return this.http.get(`http://localhost:3300/groups/getMembers/${groupId}`);
+    }
     
 }
