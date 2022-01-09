@@ -58,6 +58,15 @@ export class ItemsService {
         }));
     };
 
+    modifyTransactionNode(groupdId: string, transactionId: string, item: ItemDetails) {
+        return this.http.post(`http://localhost:3300/transactions/modify/${transactionId}`, {
+            groupdId: groupdId,
+            item: item
+        }).pipe(catchError(err => {
+            return this.authService.handleError(err, this.authService.errorSub);
+        }));
+    }
+
     fetchData(groupId: string) {
         return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData.json')
                 .pipe(

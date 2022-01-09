@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, Output, EventEmitter, Pipe } from '@angular/core';
 import { Person } from '../person.model';
 import { NgForm } from '@angular/forms';
 import { ItemsService } from '../items.service';
@@ -8,11 +8,13 @@ import { StatusCodes } from 'http-status-codes';
 import { ActivatedRoute, Data } from '@angular/router';
 import { AuthService } from '../app-auth/auth.service';
 import { ItemDetails } from '../items.model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-purchase-form',
   templateUrl: './purchase-form.component.html',
-  styleUrls: ['./purchase-form.component.css']
+  styleUrls: ['./purchase-form.component.css'],
+  providers:[DatePipe]
 })
 export class PurchaseFormComponent implements OnInit {
  
@@ -38,7 +40,8 @@ export class PurchaseFormComponent implements OnInit {
     private personService: PersonService, 
     private purchaseService: PurchaseDetailsService,
     private route: ActivatedRoute,
-    private authService: AuthService) {
+    private authService: AuthService,
+    private datePipe: DatePipe) {
   }
 
   ngOnInit() {
@@ -83,6 +86,7 @@ export class PurchaseFormComponent implements OnInit {
           this.itemService.eachPersonsDeatils.next(this.formData);
           if(!this.multiSelect) {
             delete this.formData.individualTransaction;
+            this.formData.date = this.datePipe.transform(this.formData.date, 'yyyy-MM-dd');
             this.form.setValue(this.formData);
           } else {
             this.setIndividualTransactionOnModify();
@@ -144,10 +148,20 @@ export class PurchaseFormComponent implements OnInit {
     if(!this.id) {
       this.pushDetailsToServer(form); 
     } else {
-      this.itemService.deleteEntry(this.groupName, this.id)
-      .subscribe(()=>{
-        this.pushDetailsToServer(form);
+      // this.itemService.deleteEntry(this.groupName, this.id)
+      // .subscribe(()=>{
+      //   this.pushDetailsToServer(form);
+      // });
+
+      this.itemService.modifyTransactionNode(this.groupName, this.id, form.value)
+        .subscribe((data) => {
+         if(data) {
+           this.onFetchData();
+           this.resetForm();
+           this.isSuccess = true;
+         }
       });
+
     }
   };
 
@@ -164,8 +178,8 @@ export class PurchaseFormComponent implements OnInit {
     //   }; 
 
     this.itemService.pushItemsToNode(this.groupName, form.value)
-      .subscribe((response: {message: string, item: ItemDetails}) => {
-        if(response.item) {
+      .subscribe((response: { message: string, transaction: ItemDetails }) => {
+        if(response.transaction) {
           //this.onFetchData();
           this.resetForm();
           this.isSuccess = true;

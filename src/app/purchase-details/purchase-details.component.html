@@ -29,7 +29,7 @@
                     class="btn btn-danger"
                     (click)="onDeleteData(item)">Delete this entry</button>
                     <button type="button" 
-                    class="btn btn-primary" (click)="onModifyEntry(item.key)">Modify this entry</button>
+                    class="btn btn-primary" (click)="onModifyEntryFromNode(item._id)">Modify this entry</button>
                 </div>
               </li>
             </ul>
@@ -44,5 +44,5 @@
           </ul>
         </div>
       </div>
-      <router-outlet></router-outlet>    
+      <!-- <router-outlet></router-outlet>     -->
 </div>

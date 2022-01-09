@@ -9,7 +9,7 @@ import { Subject } from 'rxjs/internal/Subject';
     providedIn: "root"
 })
 export class PersonService {
-    costEntered=new Subject<ItemDetails>();
+    costEntered = new Subject<ItemDetails>();
     constructor(private http: HttpClient) {
 
     }

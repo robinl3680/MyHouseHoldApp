@@ -129,16 +129,19 @@ export class PurchaseDetailsComponent implements OnInit {
        date : new Date().toISOString().split('T')[0],
        item: 'Debt Settle',
        key: this.groupName,
-       multiPerson: false,
+       multiPerson: null,
        person: paidInfo.sender,
        personsDistributedAmounts: [{
          amountOfEachPersons: paidInfo.amount,
          personsName: paidInfo.receiver
        }]
      };
-    this.itemService.pushItems(this.groupName, form)
+    this.itemService.pushItemsToNode(this.groupName, form)
       .subscribe((response) => {
-        if (response.status === StatusCodes.OK) {
+        // if (response.status === StatusCodes.OK) {
+        //   this.onFetchData();
+        // }
+        if(response) {
           this.onFetchData();
         }
       }), (errorMessage: string) => {
@@ -149,6 +152,10 @@ export class PurchaseDetailsComponent implements OnInit {
 
   onModifyEntry(key: string) {
     this.router.navigate(['purchase-form/' + this.groupName], {queryParams: {itemKey: key}});
+  };
+
+  onModifyEntryFromNode(transId: string) {
+    this.router.navigate(['purchase-form/' + this.groupName], { queryParams: { itemKey: transId } });
   };
 
   // onClickItem(index: number) {
