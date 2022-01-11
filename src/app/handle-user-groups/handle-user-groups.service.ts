@@ -59,7 +59,7 @@ export class UserGroupService implements OnDestroy {
         //         return this.authService.handleError(errorResponse, this.authService.errorSub);
         //     }));
 
-        this.http.post('http://localhost:3300/groups/create', {
+        this.http.post('https://house-hold-app.herokuapp.com/groups/create', {
             name: groupName
         }).pipe(
             catchError(errorResponse => {
@@ -115,7 +115,7 @@ export class UserGroupService implements OnDestroy {
 
 
     fetchGroupFromNode() {
-        return this.http.get('http://localhost:3300/groups/getAll')
+        return this.http.get('https://house-hold-app.herokuapp.com/groups/getAll')
             .pipe(
                 tap(this.handleUserGroupsFromNode.bind(this)),
                 catchError(err => {
@@ -197,7 +197,7 @@ export class UserGroupService implements OnDestroy {
         // }))
 
 
-        return this.http.post('http://localhost:3300/groups/addItem', {
+        return this.http.post('https://house-hold-app.herokuapp.com/groups/addItem', {
             groupId: groupId,
             item: item
         })
@@ -274,11 +274,11 @@ export class UserGroupService implements OnDestroy {
 
 
     deleteGroupFromNode(groupId: string) {
-        return this.http.delete(`http://localhost:3300/groups/delete/${groupId}`);
+        return this.http.delete(`https://house-hold-app.herokuapp.com/groups/delete/${groupId}`);
     }
 
     leaveGroupFromNode(groupId: string) {
-        return this.http.post('http://localhost:3300/groups/leave', {
+        return this.http.post('https://house-hold-app.herokuapp.com/groups/leave', {
             groupId: groupId
         });
     }
@@ -337,14 +337,14 @@ export class UserGroupService implements OnDestroy {
     }
 
     updateGroupNameFromNode(groupId: string, name: string) {
-        this.http.post('http://localhost:3300/groups/modifyName', {
+        this.http.post('https://house-hold-app.herokuapp.com/groups/modifyName', {
             groupId: groupId,
             newName: name
         }).subscribe();
     }
 
     joinGroupUsingNode(groupId: string) {
-        return this.http.post('http://localhost:3300/groups/join', {
+        return this.http.post('https://house-hold-app.herokuapp.com/groups/join', {
             groupId: groupId
         });
     }

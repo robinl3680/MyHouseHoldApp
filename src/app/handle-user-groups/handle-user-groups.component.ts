@@ -2,8 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Store } from '@ngxs/store';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../app-auth/auth.service';
+import { SetData } from '../app-auth/Store/actions/dummy.action';
 import { ItemDetails } from '../items.model';
 import { ItemsService } from '../items.service';
 import { groupMapping, UserGroupService } from './handle-user-groups.service';
@@ -39,7 +41,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   constructor(private groupService: UserGroupService,
     private router: Router, private authService: AuthService,
     private itemService: ItemsService,
-    private http: HttpClient) { 
+    private http: HttpClient,
+    private store: Store) { 
 
   }
   ngOnInit(): void {
@@ -52,6 +55,7 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.currentUser = userData ? userData.userUniqueId : null;
     });
     this.fetchAllGroups();
+    this.store.dispatch(new SetData(Math.floor(Math.random() * 10)));
   }
 
   ngOnDestroy() {

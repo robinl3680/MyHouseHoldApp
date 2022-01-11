@@ -166,7 +166,7 @@ export class AuthService {
         //     tap(this.handleSignUp.bind(this))).subscribe();
 
             
-        this.http.post('http://localhost:3300/auth/signup', {
+        this.http.post('https://house-hold-app.herokuapp.com/auth/signup', {
             email: email,
             password: password,
             confirmPassword: confirmPassword,
@@ -215,7 +215,7 @@ export class AuthService {
         //     tap(this.handleAuthentication.bind(this))).subscribe();
 
 
-        this.http.post('http://localhost:3300/auth/login', {
+        this.http.post('https://house-hold-app.herokuapp.com/auth/login', {
             email: email,
             password: password
         })

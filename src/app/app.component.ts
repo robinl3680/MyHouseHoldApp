@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { AuthService } from './app-auth/auth.service';
+import { DummyState } from './app-auth/Store/states/dummy.state';
 import { UserGroupService } from './handle-user-groups/handle-user-groups.service';
 
 @Component({
@@ -8,11 +10,14 @@ import { UserGroupService } from './handle-user-groups/handle-user-groups.servic
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  constructor(private authService: AuthService, private groupService: UserGroupService) {
+  constructor(private authService: AuthService, private groupService: UserGroupService, private store: Store) {
 
   }
  ngOnInit() {
    this.authService.autoLogin();
    this.groupService.autoLoadGroupId();
+   this.store.select(DummyState.getData).subscribe((d) => 
+   console.log(d)
+   );
  }
 }

@@ -32,7 +32,7 @@ export class ItemsService {
         //         })
         // );
 
-        return this.http.get(`http://localhost:3300/groups/getItems/${groupId}`)
+        return this.http.get(`https://house-hold-app.herokuapp.com/groups/getItems/${groupId}`)
         .pipe(map( (itemsObj: { items: Array<string> }) => {
             let itemArray = itemsObj.items;
             return { itemArray };
@@ -50,7 +50,7 @@ export class ItemsService {
     };
 
     pushItemsToNode(groupId: string, item: ItemDetails) {
-        return this.http.post('http://localhost:3300/transactions/newTransaction', {
+        return this.http.post('https://house-hold-app.herokuapp.com/transactions/newTransaction', {
             groupId: groupId,
             item: item
         }).pipe(catchError((errorResponse) => {
@@ -59,7 +59,7 @@ export class ItemsService {
     };
 
     modifyTransactionNode(groupdId: string, transactionId: string, item: ItemDetails) {
-        return this.http.post(`http://localhost:3300/transactions/modify/${transactionId}`, {
+        return this.http.post(`https://house-hold-app.herokuapp.com/transactions/modify/${transactionId}`, {
             groupdId: groupdId,
             item: item
         }).pipe(catchError(err => {
@@ -89,7 +89,7 @@ export class ItemsService {
     }
 
     fetchDataFromNode(groupId: string) {
-        return this.http.get(`http://localhost:3300/transactions/${groupId}/getTransactions`)
+        return this.http.get(`https://house-hold-app.herokuapp.com/transactions/${groupId}/getTransactions`)
         .pipe(tap((itemsInfo: { message: string, items: ItemDetails[]}) => {
             this.purchaseService.populatePurchaseItems(itemsInfo.items);
         }),
@@ -103,13 +103,13 @@ export class ItemsService {
     }
 
     deleteEntryFromNode(groupId: string, transactionId: string) {
-        return this.http.delete(`http://localhost:3300/transactions/${groupId}:${transactionId}/delete`);
+        return this.http.delete(`https://house-hold-app.herokuapp.com/transactions/${groupId}:${transactionId}/delete`);
     }
 
     deleteItemEntry(groupId: string, itemId: string) {
         // return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items/' + itemId + '.json');
 
-        return this.http.post(`http://localhost:3300/groups/deleteItem`, {
+        return this.http.post(`https://house-hold-app.herokuapp.com/groups/deleteItem`, {
             groupId: groupId,
             item: itemId
         });
@@ -120,7 +120,7 @@ export class ItemsService {
         //     itemName: itemName
         // });
 
-        return this.http.post(`http://localhost:3300/groups/updateItem`, {
+        return this.http.post(`https://house-hold-app.herokuapp.com/groups/updateItem`, {
             groupId: groupId,
             oldName: itemId,
             newName: itemName
