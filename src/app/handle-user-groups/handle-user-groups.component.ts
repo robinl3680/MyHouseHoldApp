@@ -17,7 +17,7 @@ import { groupMapping, UserGroupService } from './handle-user-groups.service';
 })
 export class HandleUserGroupsComponent implements OnInit, OnDestroy {
 
-  isCreateMode = false;
+  isCreateMode = true;
   isJoinMode = false;
   uniqueId: string;
   groupNames: string[] = [];
@@ -38,6 +38,29 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   items: string[];
   itemsKey: string[];
   selectedGroupId: string;
+  activeSection: ActiveSecion = 'createMode';
+  cards = [
+    {
+      title: 'Do you want to create a new group?',
+      btn: 'create',
+      section: 'createMode'
+    },
+    {
+      title: 'Want to join a new group?',
+      btn: 'join',
+      section: 'joinMode'
+    },
+    {
+      title: 'Manage your groups',
+      btn: 'Manage',
+      section: 'manageMode'
+    },
+    {
+      title: 'Item management',
+      btn: 'manage',
+      section: 'itemManagementMode'
+    }
+  ];
   constructor(private groupService: UserGroupService,
     private router: Router, private authService: AuthService,
     private itemService: ItemsService,
@@ -98,7 +121,11 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     const groupName = form.value['group-name'];
     if(this.groupNames.indexOf(groupName) === -1) {
 
-      this.groupService.createNewGroup(groupName);
+      this.groupService.createNewGroup(groupName).subscribe((response: any) => {
+        this.uniqueId = response.group['_id'];
+        this.groupNames.push(groupName);
+        this.error = null;
+      });
 
       // this.groupService.createNewGroup(groupName).subscribe((response) => {
       //   this.uniqueId = response.body['name'];
@@ -145,6 +172,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
           this.alert = "You successfully joined to the new group!!";
           this.error = null;
         }
+      }, err => {
+        this.error = err;
       });
 
 
@@ -352,4 +381,10 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onChangeActiveSection(section: ActiveSecion) {
+    this.activeSection = section;
+  }
+
 }
+
+export type ActiveSecion = 'createMode' | 'joinMode' | 'manageMode' | 'itemManagementMode';

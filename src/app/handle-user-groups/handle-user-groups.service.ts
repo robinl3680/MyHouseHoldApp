@@ -59,13 +59,8 @@ export class UserGroupService implements OnDestroy {
         //         return this.authService.handleError(errorResponse, this.authService.errorSub);
         //     }));
 
-        this.http.post('https://house-hold-app.herokuapp.com/groups/create', {
+        return this.http.post('https://house-hold-app.herokuapp.com/groups/create', {
             name: groupName
-        }).pipe(
-            catchError(errorResponse => {
-            return this.authService.handleError(errorResponse, this.authService.errorSub);
-        })).subscribe((data) => {
-            console.log(data);
         });
     }
 
@@ -346,7 +341,11 @@ export class UserGroupService implements OnDestroy {
     joinGroupUsingNode(groupId: string) {
         return this.http.post('https://house-hold-app.herokuapp.com/groups/join', {
             groupId: groupId
-        });
+        }).pipe(
+            catchError(err => {
+                return this.authService.handleError(err, this.authService.errorSub);
+            })
+        );
     }
 
     setCurrentGroupId(groupName: string) {

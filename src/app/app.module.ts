@@ -26,6 +26,7 @@ import { HandleUserGroupsComponent } from './handle-user-groups/handle-user-grou
 import { SliptUpComponent } from './purchase-form/slipt-up/slipt-up.component';
 import { NgxsModule } from '@ngxs/store';
 import { DummyState } from './app-auth/Store/states/dummy.state';
+import { CardComponent } from './handle-user-groups/card/card.component';
 
 const firebaseConfig = {};
 @NgModule({
@@ -44,7 +45,8 @@ const firebaseConfig = {};
     PasswordLengthValidator,
     PasswordMisMatchValidator,
     HandleUserGroupsComponent,
-    SliptUpComponent
+    SliptUpComponent,
+    CardComponent
   ],
   imports: [
     BrowserModule, 

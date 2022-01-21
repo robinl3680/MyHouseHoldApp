@@ -1,3 +1,4 @@
+import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { DummyInterFace, SetData } from "../actions/dummy.action";
 
@@ -8,6 +9,7 @@ import { DummyInterFace, SetData } from "../actions/dummy.action";
         data: null
     }
 })
+@Injectable()
 export class DummyState {
     @Selector()
     static getData(state: DummyInterFace) {
