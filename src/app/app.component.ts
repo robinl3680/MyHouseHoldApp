@@ -7,17 +7,19 @@ import { UserGroupService } from './handle-user-groups/handle-user-groups.servic
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
+  title;
   constructor(private authService: AuthService, private groupService: UserGroupService, private store: Store) {
 
   }
  ngOnInit() {
+   this.title = 'MyHouseHoldApp';
    this.authService.autoLogin();
    this.groupService.autoLoadGroupId();
    this.store.select(DummyState.getData).subscribe((d) => 
-   console.log(d)
+    console.log(d)
    );
  }
 }

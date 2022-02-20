@@ -298,5 +298,69 @@
                 </ul>
             </div>
         </form>
+        <form #itemForm="ngForm"*ngIf="activeSection === 'itemManagementMode'" (ngSubmit)="addItems(itemForm)">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col col-md-4">
+                        <label for="item">Item name</label>
+                    </div>
+                    <div class="col col-md-8">
+                        <input class="form-control" type="text" name="item" id="item" ngModel>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-4">
+                        <label for="group-id">Group name</label>
+                    </div>
+                    <div class="col col-md-8">
+                        <select class="form-control" name="group-id" [ngModel]="groupList[0].key">
+                            <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-4">
+                    </div>
+                    <div class="btn btn-toolbar">
+                        <button type="submit" class="btn btn-primary" [disabled]="itemForm.invalid">Add</button>
+                        <button type="button" class="btn btn-primary" (click)="onCancel()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form *ngIf="activeSection === 'itemManagementMode'" #updateOrDeleteItem="ngForm">
+            <div class="row">
+                <div class="col col-md-4">
+                    <label for="group-id">Group name</label>
+                </div>
+                <div class="col col-md-8">
+                    <select class="form-control" name="group-id" ngModel
+                        (ngModelChange)="onModelChangeForUpdateDeleteItem(updateOrDeleteItem)">
+                        <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1rem;">
+                <div class="col col-md-4"></div>
+                <div class="col col-md-8">
+                    <ul class="list-group" *ngIf="loadItems && items.length > 0">
+                        <li class="list-group-item" *ngFor="let item of items; let i = index">
+                            <input #itemData class="form-control" type="text" name="itemName" [value]="item" id="itemName">
+                            <div class="btn-toolbar">
+                                <button class="btn btn-danger" type="button"
+                                    (click)="onDeleteItem(updateOrDeleteItem, i)">Delete</button>
+                                <button class="btn btn-primary" type="button"
+                                    (click)="onUpdateItem(updateOrDeleteItem, i, itemData)">Update</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row" *ngIf="alert">
+                <div class="alert alert-success">
+                    {{ alert }}
+                </div>
+            </div>
+        </form>
     </div>
 </div>

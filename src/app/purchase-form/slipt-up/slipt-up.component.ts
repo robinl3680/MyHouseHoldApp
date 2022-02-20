@@ -26,7 +26,7 @@ export class SliptUpComponent implements OnInit {
   
   @Input() groupName: string;
 
-  constructor(private personService: PersonService,private purchaseDetailsService:PurchaseDetailsService,
+  constructor(private personService: PersonService, private purchaseDetailsService:PurchaseDetailsService,
     private itemsService:ItemsService) {
 
   }

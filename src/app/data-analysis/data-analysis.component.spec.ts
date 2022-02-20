@@ -1,4 +1,6 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { DataAnalysisComponent } from './data-analysis.component';
 
@@ -8,7 +10,11 @@ describe('DataAnalysisComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DataAnalysisComponent ]
+      declarations: [ DataAnalysisComponent ],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule
+      ]
     })
     .compileComponents();
   });
