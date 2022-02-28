@@ -166,7 +166,7 @@ export class AuthService {
         //     tap(this.handleSignUp.bind(this))).subscribe();
 
             
-        this.http.post('https://house-hold-app.herokuapp.com/auth/signup', {
+        return this.http.post('https://house-hold-app.herokuapp.com/auth/signup', {
             email: email,
             password: password,
             confirmPassword: confirmPassword,
@@ -176,7 +176,7 @@ export class AuthService {
             console.log(result);
         }), catchError((err) => {
             return this.handleError(err, this.errorSub);
-        })).subscribe();
+        }));
 
     }
 

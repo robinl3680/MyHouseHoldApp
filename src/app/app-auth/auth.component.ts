@@ -49,13 +49,13 @@ export class AuthComponent implements OnInit {
             
         } 
         else {
-            this.authService.signUp(email, password, confirmPassword, userName, phone);
-            this.authService.emailVerifyAlert.subscribe((alert) => {
-                this.alert = alert;
+            this.authService.signUp(email, password, confirmPassword, userName, phone)
+            .subscribe((alert: { signup: string }) => {
+                this.alert = alert.signup;
                 form.reset();
                 this.isLoading = false;
+                this.onSwitchMode();
             });
-            this.onSwitchMode();
         }
 
         this.authService.verifiedUser.subscribe((data) => {
