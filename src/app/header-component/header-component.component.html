@@ -4,9 +4,9 @@
             <li [routerLinkActive]="'active'" *ngIf="!isAuthenticated">
                 <a routerLink="auth">Authenticate</a>
             </li>
-            <li [routerLinkActive]="'active'" *ngIf="!isAuthenticated">
+            <!-- <li [routerLinkActive]="'active'" *ngIf="!isAuthenticated">
                 <a routerLink="phone-auth">Phone Authenticate</a>
-            </li>
+            </li> -->
             <li [routerLinkActive]="'active'" *ngIf="isAuthenticated">
                 <a [routerLink]="['groups-view']">Group view</a>
             </li>
