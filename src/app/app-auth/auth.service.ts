@@ -45,6 +45,14 @@ export class AuthService {
         if(errorSubj) {
             errorSubj.next(errorMessage);
         }
+
+
+        if(errorResponse.error.message && errorSubj) {
+            errorSubj.next(errorResponse.error.message);
+            return throwError(errorResponse.error.message);
+        }
+
+
         if( !errorResponse || !errorResponse.error || !errorResponse.error.error) {
             return throwError(errorMessage);
         }
@@ -134,27 +142,42 @@ export class AuthService {
     }
 
 
-    private handleAuthentication(responseData: AuthResponse) {
-        const expireDate = new Date(new Date().getTime() + (+responseData.expiresIn) * 1000);
-        const user = new UserModel(responseData.email, responseData.localId, responseData.idToken, expireDate);
-        this.currentUser = user;
-        this.currentExpireTime = (+responseData.expiresIn) * 1000;
-        this.getUserData(responseData.idToken);
-    }
+    // private handleAuthentication(responseData) {
+    //     const expireDate = new Date(new Date().getTime() + (+responseData.expiresIn) * 1000);
+    //     const user = new UserModel(responseData.email, responseData.localId, responseData.idToken, expireDate);
+    //     this.currentUser = user;
+    //     this.currentExpireTime = (+responseData.expiresIn) * 1000;
+    //     this.getUserData(responseData.idToken);
+    // }
+    
 
-    public signUp(email: string, password: string, userName: string, phone: string) {
-        this.currentUserInfo['userName'] = userName;
-        this.currentUserInfo['phone'] = phone;
-        this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
-        {
+    public signUp(email: string, password: string, confirmPassword: string, userName: string, phone: string) {
+        // this.currentUserInfo['userName'] = userName;
+        // this.currentUserInfo['phone'] = phone;
+        // this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
+        // {
+        //     email: email,
+        //     password: password,
+        //     returnSecureToken: true
+        // })
+        // .pipe(catchError((errorResponse) => {
+        //     return this.handleError(errorResponse, this.errorSub);
+        // }),
+        //     tap(this.handleSignUp.bind(this))).subscribe();
+
+            
+        return this.http.post('https://house-hold-app.herokuapp.com/auth/signup', {
             email: email,
             password: password,
-            returnSecureToken: true
-        })
-        .pipe(catchError((errorResponse) => {
-            return this.handleError(errorResponse, this.errorSub);
-        }),
-            tap(this.handleSignUp.bind(this))).subscribe();
+            confirmPassword: confirmPassword,
+            phone: phone,
+            name: userName
+        }).pipe(tap((result) => {
+            console.log(result);
+        }), catchError((err) => {
+            return this.handleError(err, this.errorSub);
+        }));
+
     }
 
     public verifyEmail(email: string, idToken: string) {
@@ -180,39 +203,70 @@ export class AuthService {
     }
 
     public login(email: string, password: string) {
-        this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
-        {
+        // this.http.post<AuthResponse>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC0T6afZwBlanup5OPIIlto90nsaE15acI',
+        // {
+        //     email: email,
+        //     password: password,
+        //     returnSecureToken: true
+        // })
+        // .pipe(catchError((errorResponse) => {
+        //     return this.handleError(errorResponse, this.errorSub);
+        // }),
+        //     tap(this.handleAuthentication.bind(this))).subscribe();
+
+
+        this.http.post('https://house-hold-app.herokuapp.com/auth/login', {
             email: email,
-            password: password,
-            returnSecureToken: true
+            password: password
         })
-        .pipe(catchError((errorResponse) => {
-            return this.handleError(errorResponse, this.errorSub);
-        }),
-            tap(this.handleAuthentication.bind(this))).subscribe();
+        .pipe(
+            tap(this.handleAuthenticationNode.bind(this)), 
+            catchError((err) => {
+                return this.handleError(err, this.errorSub);
+            }))
+        .subscribe();
+    }
+
+    public handleAuthenticationNode(responseData) {
+        console.log(responseData);
+        const user = new UserModel(responseData.token, responseData.email);
+        this.currentUser = user;
+        this.verifiedUser.next(true);
+        localStorage.setItem('userData', JSON.stringify(this.currentUser));
+        const expireTime = 1 * 60 * 1000;
+        //this.autoLogOut(expireTime);
+        this.user.next(this.currentUser);
+        if (this.currentUserInfo) {
+            this.user.subscribe((response) => {
+                if (response) {
+                    this.addUserNamePhoneToUserPath(this.currentUser.userUniqueId);
+                }
+            });
+        }
     }
 
     public autoLogin() {
         const userData: {
             _email: string, 
-            _userId: string,
+            // _userId: string,
             _token: string,
-            _tokenExpires: string,
-            _userDetails: object
+            // _tokenExpires: string,
+            // _userDetails: object
         } = JSON.parse(localStorage.getItem('userData'));
         if(userData) {
-            const loadedUser = new UserModel(userData._email, userData._userId, userData._token, new Date(userData._tokenExpires));
+            //const loadedUser = new UserModel(userData._email, userData._userId, userData._token, new Date(userData._tokenExpires));
+            const loadedUser = new UserModel(userData._token, userData._email);
             if(loadedUser.token) {
-                const expires = new Date(userData._tokenExpires).getTime() - new Date().getTime();
-                this.autoLogOut(expires);
+                //const expires = new Date(userData._tokenExpires).getTime() - new Date().getTime();
+                //this.autoLogOut(expires);
                 this.user.next(loadedUser);
             }
         }
     }
 
     autoLogOut(expiresTime: number) {
-        const minLimit = 1000 * 60 * 10;
-        expiresTime = minLimit < expiresTime ? minLimit : expiresTime;
+        // const minLimit = 1000 * 60 * 10;
+        // expiresTime = minLimit < expiresTime ? minLimit : expiresTime;
         this. autoLogOutInterval = setTimeout(()=>{
             this.onLogOut();
         }, expiresTime);

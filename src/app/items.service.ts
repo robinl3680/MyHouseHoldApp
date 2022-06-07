@@ -17,20 +17,26 @@ export class ItemsService {
     }
     
     accessItems(groupId: string) {
-        return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json')
-                .pipe(
-                map((items) => {
-                    let itemArray: string[] = [];
-                    let itemKey: string[] = [];
-                    for(const key in items) {
-                        if(items.hasOwnProperty(key)) {
-                            itemArray.push(items[key].itemName);
-                            itemKey.push(key);
-                        }
-                    }
-                    return {itemArray, itemKey};
-                })
-        );
+        // return this.http.get('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items.json')
+        //         .pipe(
+        //         map((items) => {
+        //             let itemArray: string[] = [];
+        //             let itemKey: string[] = [];
+        //             for(const key in items) {
+        //                 if(items.hasOwnProperty(key)) {
+        //                     itemArray.push(items[key].itemName);
+        //                     itemKey.push(key);
+        //                 }
+        //             }
+        //             return {itemArray, itemKey};
+        //         })
+        // );
+
+        return this.http.get(`https://house-hold-app.herokuapp.com/groups/getItems/${groupId}`)
+        .pipe(map( (itemsObj: { items: Array<string> }) => {
+            let itemArray = itemsObj.items;
+            return { itemArray };
+        }));
     }
 
     pushItems(groupId: string, item: ItemDetails) {
@@ -40,6 +46,24 @@ export class ItemsService {
         })
         .pipe(catchError((errorResponse) => {
             return this.authService.handleError(errorResponse, this.authService.errorSub);
+        }));
+    };
+
+    pushItemsToNode(groupId: string, item: ItemDetails) {
+        return this.http.post('https://house-hold-app.herokuapp.com/transactions/newTransaction', {
+            groupId: groupId,
+            item: item
+        }).pipe(catchError((errorResponse) => {
+            return this.authService.handleError(errorResponse, this.authService.errorSub);
+        }));
+    };
+
+    modifyTransactionNode(groupdId: string, transactionId: string, item: ItemDetails) {
+        return this.http.post(`https://house-hold-app.herokuapp.com/transactions/modify/${transactionId}`, {
+            groupdId: groupdId,
+            item: item
+        }).pipe(catchError(err => {
+            return this.authService.handleError(err, this.authService.errorSub);
         }));
     }
 
@@ -64,17 +88,42 @@ export class ItemsService {
         );
     }
 
+    fetchDataFromNode(groupId: string) {
+        return this.http.get(`https://house-hold-app.herokuapp.com/transactions/${groupId}/getTransactions`)
+        .pipe(tap((itemsInfo: { message: string, items: ItemDetails[]}) => {
+            this.purchaseService.populatePurchaseItems(itemsInfo.items);
+        }),
+            catchError((errorResponse) => {
+                return this.authService.handleError(errorResponse, this.authService.errorSub);
+            }));
+    }
+
     deleteEntry(groupId: string, key: string) {
         return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/dailyData/' + key + '.json' );
     }
 
+    deleteEntryFromNode(groupId: string, transactionId: string) {
+        return this.http.delete(`https://house-hold-app.herokuapp.com/transactions/${groupId}:${transactionId}/delete`);
+    }
+
     deleteItemEntry(groupId: string, itemId: string) {
-        return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items/' + itemId + '.json');
+        // return this.http.delete('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items/' + itemId + '.json');
+
+        return this.http.post(`https://house-hold-app.herokuapp.com/groups/deleteItem`, {
+            groupId: groupId,
+            item: itemId
+        });
     }
 
     updateItemEntry(groupId: string, itemId: string, itemName: string) {
-        return this.http.patch('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items/' + itemId + '.json', {
-            itemName: itemName
+        // return this.http.patch('https://householdapp-7db63-default-rtdb.firebaseio.com/protectedData/' + groupId + '/items/' + itemId + '.json', {
+        //     itemName: itemName
+        // });
+
+        return this.http.post(`https://house-hold-app.herokuapp.com/groups/updateItem`, {
+            groupId: groupId,
+            oldName: itemId,
+            newName: itemName
         });
     }
 

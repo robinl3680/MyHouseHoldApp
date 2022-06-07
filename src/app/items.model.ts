@@ -5,6 +5,7 @@ export interface ItemDetails {
     date: Date | string,
     person: string,
     key?: string,
+    _id?: string,
     personsDistributedAmounts: PersonsDistributedAmounts[],
     multiPerson?: boolean,
     individualTransaction?: {}

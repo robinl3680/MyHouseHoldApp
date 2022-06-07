@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewChecked, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { FilterService } from './filter.service';
 

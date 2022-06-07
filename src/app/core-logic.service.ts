@@ -19,12 +19,14 @@ export class CoreLogicService {
   }
 
   private getPersonDetails(groupId: string) {
-    this.personService.fetchPersonDetails(groupId).subscribe((persons) => {
-      this.persons = persons.map(person => person.name);
-      this.directedGraph = [...Array(persons.length)].map(e => Array(persons.length).fill(0));
+    this.personService.fetchPersonDetailsFromNode(groupId).subscribe((persons: {members: [{name: string, phone: number}]}) => {
+      this.persons = persons.members.map(person => person.name);
+      this.directedGraph = [...Array(persons.members.length)].map(e => Array(persons.members.length).fill(0));
       this.constructDirectedGraph();
-      this.calculateNetAmount();
-      this.getToBePaidInfo();
+      if(this.directedGraph.length > 0) {
+        this.calculateNetAmount();
+        this.getToBePaidInfo();
+      }
     });
   }
 

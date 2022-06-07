@@ -24,6 +24,9 @@ import { PasswordLengthValidator } from './shared/password-validator';
 import { PasswordMisMatchValidator } from './shared/password-mismatch-validator';
 import { HandleUserGroupsComponent } from './handle-user-groups/handle-user-groups.component';
 import { SliptUpComponent } from './purchase-form/slipt-up/slipt-up.component';
+import { NgxsModule } from '@ngxs/store';
+import { DummyState } from './app-auth/Store/states/dummy.state';
+import { CardComponent } from './handle-user-groups/card/card.component';
 
 const firebaseConfig = {};
 @NgModule({
@@ -42,7 +45,8 @@ const firebaseConfig = {};
     PasswordLengthValidator,
     PasswordMisMatchValidator,
     HandleUserGroupsComponent,
-    SliptUpComponent
+    SliptUpComponent,
+    CardComponent
   ],
   imports: [
     BrowserModule, 
@@ -53,7 +57,10 @@ const firebaseConfig = {};
     TooltipModule,
     ChartsModule,
     AngularFireModule.initializeApp(firebaseConfig),
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    NgxsModule.forRoot([
+      DummyState
+    ])
   ],
   providers: [{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]

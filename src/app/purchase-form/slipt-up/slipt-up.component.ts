@@ -26,7 +26,7 @@ export class SliptUpComponent implements OnInit {
   
   @Input() groupName: string;
 
-  constructor(private personService: PersonService,private purchaseDetailsService:PurchaseDetailsService,
+  constructor(private personService: PersonService, private purchaseDetailsService:PurchaseDetailsService,
     private itemsService:ItemsService) {
 
   }
@@ -35,11 +35,11 @@ export class SliptUpComponent implements OnInit {
     this.itemsService.eachPersonsDeatils.subscribe((personsDetails)=>{
       this.modefyData = personsDetails;
     });
-    this.personService.fetchPersonDetails(this.groupName)
-      .subscribe((persons: Person[]) => {
+    this.personService.fetchPersonDetailsFromNode(this.groupName)
+      .subscribe((persons: { message: string, members: Person[]}) => {
         if(this.persons.length === 0) {
-          this.persons = persons;
-          this.uncheckedBoxes = persons.length;
+          this.persons = persons.members;
+          this.uncheckedBoxes = persons.members.length;
           if (this.uncheckedBoxes > 0) {
             for (let index in this.persons) {
               if (this.modefyData && this.modefyData.personsDistributedAmounts) {

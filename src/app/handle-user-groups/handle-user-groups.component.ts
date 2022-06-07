@@ -1,8 +1,11 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Store } from '@ngxs/store';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../app-auth/auth.service';
+import { SetData } from '../app-auth/Store/actions/dummy.action';
 import { ItemDetails } from '../items.model';
 import { ItemsService } from '../items.service';
 import { groupMapping, UserGroupService } from './handle-user-groups.service';
@@ -14,7 +17,7 @@ import { groupMapping, UserGroupService } from './handle-user-groups.service';
 })
 export class HandleUserGroupsComponent implements OnInit, OnDestroy {
 
-  isCreateMode = false;
+  isCreateMode = true;
   isJoinMode = false;
   uniqueId: string;
   groupNames: string[] = [];
@@ -34,9 +37,35 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   loadItems: boolean;
   items: string[];
   itemsKey: string[];
+  selectedGroupId: string;
+  activeSection: ActiveSecion = 'createMode';
+  cards = [
+    {
+      title: 'Do you want to create a new group?',
+      btn: 'create',
+      section: 'createMode'
+    },
+    {
+      title: 'Want to join a new group?',
+      btn: 'join',
+      section: 'joinMode'
+    },
+    {
+      title: 'Manage your groups',
+      btn: 'Manage',
+      section: 'manageMode'
+    },
+    {
+      title: 'Item management',
+      btn: 'manage',
+      section: 'itemManagementMode'
+    }
+  ];
   constructor(private groupService: UserGroupService,
     private router: Router, private authService: AuthService,
-    private itemService: ItemsService) { 
+    private itemService: ItemsService,
+    private http: HttpClient,
+    private store: Store) { 
 
   }
   ngOnInit(): void {
@@ -49,6 +78,7 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.currentUser = userData ? userData.userUniqueId : null;
     });
     this.fetchAllGroups();
+    this.store.dispatch(new SetData(Math.floor(Math.random() * 10)));
   }
 
   ngOnDestroy() {
@@ -90,15 +120,22 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   onSubmitCreateGroup(form: NgForm) {
     const groupName = form.value['group-name'];
     if(this.groupNames.indexOf(groupName) === -1) {
-      this.groupService.createNewGroup(groupName).subscribe((response) => {
-        this.uniqueId = response.body['name'];
+
+      this.groupService.createNewGroup(groupName).subscribe((response: any) => {
+        this.uniqueId = response.group['_id'];
         this.groupNames.push(groupName);
-        this.groupService.addPersonToGroup(this.uniqueId);
-        this.groupService.addGroupNameToGroupId(this.uniqueId, groupName).subscribe();
-        this.groupService.addGroupToUserProfile(this.uniqueId, groupName).subscribe((response) => {
-          this.groupService.deleteUnnecessaryData(this.uniqueId);
-        });
+        this.error = null;
       });
+
+      // this.groupService.createNewGroup(groupName).subscribe((response) => {
+      //   this.uniqueId = response.body['name'];
+      //   this.groupNames.push(groupName);
+      //   this.groupService.addPersonToGroup(this.uniqueId);
+      //   this.groupService.addGroupNameToGroupId(this.uniqueId, groupName).subscribe();
+      //   this.groupService.addGroupToUserProfile(this.uniqueId, groupName).subscribe((response) => {
+      //     this.groupService.deleteUnnecessaryData(this.uniqueId);
+      //   });
+      // });
     } else {
       this.error = "This group is already there !!";
     }
@@ -111,22 +148,35 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.error = "You already joined to this group!!";
       this.alert = null;
     } else {
-      this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
-        if (groupName) {
-          if (this.groupNames.indexOf(groupName) === -1) {
-            this.groupService.addPersonToGroup(groupId);
-            this.groupService.addGroupToUserProfile(groupId, groupName).subscribe();
-            this.alert = "You successfully joined to the new group!!";
-            this.error = null;
-          } else {
-            this.error = "You already joined to this group!!";
-            this.alert = null;
-          }
-        } else {
-          this.error = "No such group is there !!";
-          this.alert = null;
+    //   this.groupService.getGroupNameFromGroupId(groupId).subscribe((groupName) => {
+    //     if (groupName) {
+    //       if (this.groupNames.indexOf(groupName) === -1) {
+    //         this.groupService.addPersonToGroup(groupId);
+    //         this.groupService.addGroupToUserProfile(groupId, groupName).subscribe();
+    //         this.alert = "You successfully joined to the new group!!";
+    //         this.error = null;
+    //       } else {
+    //         this.error = "You already joined to this group!!";
+    //         this.alert = null;
+    //       }
+    //     } else {
+    //       this.error = "No such group is there !!";
+    //       this.alert = null;
+    //     }
+    //   });
+
+      this.groupService.joinGroupUsingNode(groupId)
+      .subscribe((group) => {
+        if(group) {
+          console.log(group);
+          this.alert = "You successfully joined to the new group!!";
+          this.error = null;
         }
+      }, err => {
+        this.error = err;
       });
+
+
     }
   }
 
@@ -159,8 +209,12 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
   }
 
   fetchAllGroups() {
-    this.groupService.fetchGroup().subscribe();
-    this.subscription = this.groupService.groupNamesLoaded.subscribe(this.handleGroupLoaded.bind(this));
+    this.groupService.fetchGroup().subscribe((data) => {
+      this.groupNames = this.groupService.getGroupNames;
+      this.groupList = this.groupService.getGroupIdgroupMapping;
+      this.leavingMode = false;
+    });
+    //this.subscription = this.groupService.groupNamesLoaded.subscribe(this.handleGroupLoaded.bind(this));
   }
 
   handleGroupLoaded(isLoaded) {
@@ -212,8 +266,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
 
   addItems(form: NgForm) {
     this.alert = null;
-    const groupId = form.value['group-id'];
     const item = form.value['item'];
+    const groupId = form.value['group-id'];
     this.groupService.addItemsToGroup(groupId, item).subscribe((response) => {
       if(response) {
         this.alert = "Item added successfully";
@@ -238,7 +292,10 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.error = null;
       this.leavingMode = true;
       this.isModificationMode = false;
-      this.groupService.modifyGroupName(key, newName);
+      // this.groupService.modifyGroupName(key, newName);
+
+      
+
     } else {
       this.error = "This group is already there !!";
     }
@@ -248,20 +305,35 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     if(creator === this.currentUser) { //Delete case
       if(confirm("Are sure want to delete ?")) {
         this.leavingMode = true;
-        this.groupService.deleteGroupNameFromUser(groupId).subscribe((responseData) => {
-          responseData.subscribe(() => {
-            this.groupService.deleteGroup(groupId).subscribe(() => {
-              this.fetchAllGroups();
-            });
-          });
+        // this.groupService.deleteGroupNameFromUser(groupId).subscribe((responseData) => {
+        //   responseData.subscribe(() => {
+        //     this.groupService.deleteGroup(groupId).subscribe(() => {
+        //       this.fetchAllGroups();
+        //     });
+        //   });
+        // });
+
+
+        this.groupService.deleteGroupFromNode(groupId)
+        .subscribe(res => {
+          this.fetchAllGroups();
         });
+
+
       }
     } else { //Leave case
       this.leavingMode = true;
-      this.groupService.deletePersonFromGroup(groupId);
-      this.groupService.deleteGroupNameFromUser(groupId).subscribe((response)=>{
-        response.subscribe();
+      // this.groupService.deletePersonFromGroup(groupId);
+      // this.groupService.deleteGroupNameFromUser(groupId).subscribe((response)=>{
+      //   response.subscribe();
+      // });
+
+
+      this.groupService.leaveGroupFromNode(groupId)
+      .subscribe(res => {
+        this.fetchAllGroups();
       });
+
     }
   }
 
@@ -273,25 +345,35 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.loadItems = true;
       this.itemService.accessItems(groupName).subscribe((items) => {
         this.items = items.itemArray;
-        this.itemsKey = items.itemKey;
+        //this.itemsKey = items.itemKey;
       });
     }
   }
 
   onDeleteItem(formData, index) {
-    if(confirm("Are sure want to delete ?")) {
+    // if(confirm("Are sure want to delete ?")) {
+    //   const groupId = formData.value['group-id'];
+    //   const itemKey = this.itemsKey[index];
+    //   this.itemService.deleteItemEntry(groupId, itemKey).subscribe(result => {
+    //     this.alert = "Item deleted successfully";
+    //     this.onModelChangeForUpdateDeleteItem(formData);
+    //   });
+    // }
+
+    if (confirm("Are sure want to delete ?")) {
       const groupId = formData.value['group-id'];
-      const itemKey = this.itemsKey[index];
+      const itemKey = this.items[index];
       this.itemService.deleteItemEntry(groupId, itemKey).subscribe(result => {
         this.alert = "Item deleted successfully";
         this.onModelChangeForUpdateDeleteItem(formData);
       });
     }
+
   }
 
   onUpdateItem(formData, index, itemData) {
     const groupId = formData.value['group-id'];
-    const itemKey = this.itemsKey[index];
+    const itemKey = this.items[index];
     const itemName = itemData.value;
     this.itemService.updateItemEntry(groupId, itemKey, itemName).subscribe(result => {
       this.alert = "Item updated successfully";
@@ -299,4 +381,10 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onChangeActiveSection(section: ActiveSecion) {
+    this.activeSection = section;
+  }
+
 }
+
+export type ActiveSecion = 'createMode' | 'joinMode' | 'manageMode' | 'itemManagementMode';

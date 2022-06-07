@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ItemDetails, PersonsDistributedAmounts } from './items.model';
-import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: "root"
@@ -37,7 +36,7 @@ export class PurchaseDetailsService {
 
     onModifyEntry(key: string): ItemDetails {
         for(const item of this.retrievedItems) {
-            if(item.key === key) {
+            if(item._id === key) {
               return ({
                 date: item.date,
                 item: item.item,

@@ -51,13 +51,23 @@ export class PurchaseDetailsComponent implements OnInit {
     }
   }
 
-  onDeleteData(key: string) {
+  onDeleteData(item) {
     const isOkay = confirm("Do you really want to delete this entry ?");
     if(isOkay) {
-      this.itemService.deleteEntry(this.groupName, key)
-      .subscribe((data)=> {
+      // this.itemService.deleteEntry(this.groupName, key)
+      // .subscribe((data)=> {
+      //   this.onFetchData();
+      // });
+
+      const transactionId = item._id;
+      const groupId = item.group;
+
+      this.itemService.deleteEntryFromNode(groupId, transactionId)
+      .subscribe((data) => {
+        console.log(data);
         this.onFetchData();
       });
+
     }
   };
 
@@ -79,20 +89,38 @@ export class PurchaseDetailsComponent implements OnInit {
   }
 
   onFetchData() {
-    this.itemService.fetchData(this.groupName)
-    .subscribe((items)=>{
-      this.purchaseService.populatePurchaseItems(items);
-      this.retrievedItems = items;
-      this.populateIndividualTransaction();
-      this.fetChMode = false;
-      this.coreService.setItemDetails(this.retrievedItems, this.groupName);
-      this.coreService.getToBepaidInfoSubj.subscribe(info => {
-        this.toBePaidInfo = info;
+    // this.itemService.fetchData(this.groupName)
+    // .subscribe((items)=>{
+    //   this.purchaseService.populatePurchaseItems(items);
+    //   this.retrievedItems = items;
+    //   this.populateIndividualTransaction();
+    //   this.fetChMode = false;
+    //   this.coreService.setItemDetails(this.retrievedItems, this.groupName);
+    //   this.coreService.getToBepaidInfoSubj.subscribe(info => {
+    //     this.toBePaidInfo = info;
+    //   });
+    // }, (errorMessage: string) => {
+    //   this.error = errorMessage;
+    //   this.fetChMode = false;
+    // });
+
+
+    this.itemService.fetchDataFromNode(this.groupName)
+      .subscribe((itemsInfo) => {
+        this.purchaseService.populatePurchaseItems(itemsInfo.items);
+        this.retrievedItems = itemsInfo.items;
+        this.populateIndividualTransaction();
+        this.fetChMode = false;
+        this.coreService.setItemDetails(this.retrievedItems, this.groupName);
+        this.coreService.getToBepaidInfoSubj.subscribe(info => {
+          this.toBePaidInfo = info;
+        });
+      }, (errorMessage: string) => {
+        this.error = errorMessage;
+        this.fetChMode = false;
       });
-    }, (errorMessage: string) => {
-      this.error = errorMessage;
-      this.fetChMode = false;
-    });
+
+
   };
 
   onSettleDebt(paidInfo: {sender: string, receiver: string, amount: number}, index: number) {
@@ -101,16 +129,19 @@ export class PurchaseDetailsComponent implements OnInit {
        date : new Date().toISOString().split('T')[0],
        item: 'Debt Settle',
        key: this.groupName,
-       multiPerson: false,
+       multiPerson: null,
        person: paidInfo.sender,
        personsDistributedAmounts: [{
          amountOfEachPersons: paidInfo.amount,
          personsName: paidInfo.receiver
        }]
      };
-    this.itemService.pushItems(this.groupName, form)
+    this.itemService.pushItemsToNode(this.groupName, form)
       .subscribe((response) => {
-        if (response.status === StatusCodes.OK) {
+        // if (response.status === StatusCodes.OK) {
+        //   this.onFetchData();
+        // }
+        if(response) {
           this.onFetchData();
         }
       }), (errorMessage: string) => {
@@ -121,6 +152,10 @@ export class PurchaseDetailsComponent implements OnInit {
 
   onModifyEntry(key: string) {
     this.router.navigate(['purchase-form/' + this.groupName], {queryParams: {itemKey: key}});
+  };
+
+  onModifyEntryFromNode(transId: string) {
+    this.router.navigate(['purchase-form/' + this.groupName], { queryParams: { itemKey: transId } });
   };
 
   // onClickItem(index: number) {

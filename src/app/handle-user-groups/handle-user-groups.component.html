@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
     <div class="form-group">
         <div class="row" *ngIf="groupList.length === 0 && alert && !isCreateMode">
             <div class="alert alert-danger">
@@ -136,7 +136,7 @@
                         <label for="group-id">Group name</label>
                     </div>
                     <div class="col col-md-4">
-                        <select class="form-control" name="group-id" ngModel>
+                        <select class="form-control" name="group-id" [ngModel]="groupList[0].key">
                             <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
                         </select>
                     </div>
@@ -182,6 +182,175 @@
                             <div class="btn-toolbar">
                                 <button class="btn btn-danger" type="button" (click)="onDeleteItem(updateOrDeleteItem, i)">Delete</button>
                                 <button class="btn btn-primary" type="button" (click)="onUpdateItem(updateOrDeleteItem, i, itemData)">Update</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row" *ngIf="alert">
+                <div class="alert alert-success">
+                    {{ alert }}
+                </div>
+            </div>
+        </form>
+    </div>
+</div> -->
+
+<div class="outer-container">
+    <div class="card-container">
+        <div class="group-section" *ngFor="let card of cards;">
+            <app-card [title]="card.title" [buttonTitle]="card.btn" [section]="card.section" (activeSection)="onChangeActiveSection($event)"></app-card>
+        </div>
+    </div>
+    <div class="vert-line">
+    
+    </div>
+    <div class="form-container">
+        <form *ngIf="activeSection === 'createMode'" #createForm="ngForm" (ngSubmit)="onSubmitCreateGroup(createForm)">
+            <div class="row">
+                <div class="form-group">
+                    <div class="col col-md-4">
+                        <label for="group-name">Group Name</label>
+                    </div>
+                    <div class="col col-md-8">
+                        <input class="form-control" ngModel type="text" id="group-name" name="group-name" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-md-4"></div>
+                <div class="btn btn-toolbar">
+                    <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid">Submit</button>
+                </div>
+            </div>
+            <div class="row">
+                <div *ngIf="uniqueId" style="color: green; margin-left: 1rem;">
+                    successfully created share this id to other for join: <span style="font-weight: bold;">{{uniqueId}}</span>
+                </div>
+                <div *ngIf="error" style="color: red; margin-left: 1rem;">
+                   {{error}}
+                </div>
+            </div>
+        </form>
+        <form *ngIf="activeSection === 'joinMode'" #joinForm="ngForm" (ngSubmit)="onSubmitJoin(joinForm)">
+            <div class="row">
+                <div class="form-group">
+                    <div class="col col-md-4">
+                        <label for="group-id">Unique Id</label>
+                    </div>
+                    <div class="col col-md-8">
+                        <input class="form-control" ngModel type="text" id="group-id" name="group-id" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-md-4">
+                </div>
+                <div class="btn btn-toolbar">
+                    <button type="submit" class="btn btn-primary" [disabled]="joinForm.invalid">Join</button>
+                </div>
+            </div>
+            <div *ngIf=" error" style="padding-top: 15px;">
+                <span class="alert alert-danger">{{error}}</span>
+            </div>
+            <div *ngIf="alert" style="padding-top: 15px;">
+                <span class="alert alert-success">{{alert}}</span>
+            </div>
+        </form>
+        <form *ngIf="activeSection === 'manageMode'" #groupForm="ngForm">
+            <div class="col col-md-12" *ngIf="groupList.length > 0">
+                <app-loading-spinner *ngIf="leavingMode"></app-loading-spinner>
+                <ul class="list-group" *ngIf="!leavingMode && groupNames.length > 0">
+                    <li class="list-group-item" *ngFor="let item of groupList; let i = index;">
+                        <div>
+                            <h6>Group name: {{item.groupName}}</h6>
+                            <h6>Group ID: {{item.key}}</h6>
+                            <div *ngIf="isModificationMode && currentIndex === i">
+                                <input class="form-control" type="text" name="newGroupName" ngModel placeholder="New name"
+                                    required>
+                                <div class="btn-toolbar">
+                                    <button type="button" class="btn btn-primary"
+                                        (click)="onModifyGroupName(item.key, groupForm)"
+                                        [disabled]="groupForm.invalid">Update</button>
+                                    <button type="button" class="btn btn-primary"
+                                        (click)="disableModifyGroupName()">Cancel</button>
+                                </div>
+                            </div>
+                            <div *ngIf="error && isModificationMode">
+                                <span style="color: red;">{{error}}</span>
+                            </div>
+                            <div *ngIf="alert && isModificationMode">
+                                <span style="color: green;">{{alert}}</span>
+                            </div>
+                        </div>
+                        <div class="btn-toolbar">
+                            <button type="button" class="btn btn-danger"
+                                (click)="onClickLeaveOrDelete(item.creator, item.key)">{{ currentUser === item.creator ? 'Delete
+                                group' : 'Leave group'}}</button>
+                            <button type="button" class="btn btn-primary" (click)="enableModifyGroup(i)"
+                                *ngIf="currentUser === item.creator">Modify group name</button>
+                            <button type="button" class="btn btn-primary" [show-delay]="1000" autoPlacement="true"
+                                tooltip="navigate to group" (click)="navigateToGroup(item)">
+                                <span class="glyphicon glyphicon-chevron-right"></span>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </form>
+        <form #itemForm="ngForm"*ngIf="activeSection === 'itemManagementMode'" (ngSubmit)="addItems(itemForm)">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col col-md-4">
+                        <label for="item">Item name</label>
+                    </div>
+                    <div class="col col-md-8">
+                        <input class="form-control" type="text" name="item" id="item" ngModel>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-4">
+                        <label for="group-id">Group name</label>
+                    </div>
+                    <div class="col col-md-8">
+                        <select class="form-control" name="group-id" [ngModel]="groupList[0].key">
+                            <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-md-4">
+                    </div>
+                    <div class="btn btn-toolbar">
+                        <button type="submit" class="btn btn-primary" [disabled]="itemForm.invalid">Add</button>
+                        <button type="button" class="btn btn-primary" (click)="onCancel()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form *ngIf="activeSection === 'itemManagementMode'" #updateOrDeleteItem="ngForm">
+            <div class="row">
+                <div class="col col-md-4">
+                    <label for="group-id">Group name</label>
+                </div>
+                <div class="col col-md-8">
+                    <select class="form-control" name="group-id" ngModel
+                        (ngModelChange)="onModelChangeForUpdateDeleteItem(updateOrDeleteItem)">
+                        <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1rem;">
+                <div class="col col-md-4"></div>
+                <div class="col col-md-8">
+                    <ul class="list-group" *ngIf="loadItems && items.length > 0">
+                        <li class="list-group-item" *ngFor="let item of items; let i = index">
+                            <input #itemData class="form-control" type="text" name="itemName" [value]="item" id="itemName">
+                            <div class="btn-toolbar">
+                                <button class="btn btn-danger" type="button"
+                                    (click)="onDeleteItem(updateOrDeleteItem, i)">Delete</button>
+                                <button class="btn btn-primary" type="button"
+                                    (click)="onUpdateItem(updateOrDeleteItem, i, itemData)">Update</button>
                             </div>
                         </li>
                     </ul>

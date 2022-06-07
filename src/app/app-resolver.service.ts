@@ -18,6 +18,5 @@ export class AppResolver implements Resolve<ItemDetails[]> {
         } else {
             return items;
         }
-
     }
 }
