@@ -27,6 +27,7 @@ import { SliptUpComponent } from './purchase-form/slipt-up/slipt-up.component';
 import { NgxsModule } from '@ngxs/store';
 import { DummyState } from './app-auth/Store/states/dummy.state';
 import { CardComponent } from './handle-user-groups/card/card.component';
+import { AppIntroductionComponent } from './app-introduction/app-introduction.component';
 
 const firebaseConfig = {};
 @NgModule({
@@ -46,7 +47,8 @@ const firebaseConfig = {};
     PasswordMisMatchValidator,
     HandleUserGroupsComponent,
     SliptUpComponent,
-    CardComponent
+    CardComponent,
+    AppIntroductionComponent
   ],
   imports: [
     BrowserModule, 

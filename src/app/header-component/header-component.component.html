@@ -1,9 +1,11 @@
 <nav class="navbar navbar-default">
     <div class="container-fluid">
-        <ul class="nav navbar-nav">
-            <li [routerLinkActive]="'active'" *ngIf="!isAuthenticated">
-                <a routerLink="auth">Authenticate</a>
+        <ul class="nav navbar-nav navbar-left">
+            <li [routerLinkActive]="'active'">
+                <a routerLink="home">Home</a>
             </li>
+        </ul>
+        <ul class="nav navbar-nav">
             <!-- <li [routerLinkActive]="'active'" *ngIf="!isAuthenticated">
                 <a routerLink="phone-auth">Phone Authenticate</a>
             </li> -->
@@ -23,6 +25,11 @@
         <ul class="nav navbar-nav navbar-right">
             <li [routerLinkActive]="'active'" *ngIf="isAuthenticated">
                 <a style="cursor: pointer;" (click)="onLogOut()">Logout</a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right" *ngIf="!isAuthenticated">
+            <li [routerLinkActive]="'active'">
+                <a routerLink="auth">Authenticate</a>
             </li>
         </ul>
     </div>

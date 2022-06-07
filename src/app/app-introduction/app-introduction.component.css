@@ -1,0 +1,26 @@
+.container-intro {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  padding-left: 5%;
+}
+.app-summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.chart-icon {
+  width: 120px;
+  height: 120px;
+  padding: 2rem;
+}
+.btn-explore {
+  background-color: blue;
+  color: white;
+  outline: none;
+}
+.btn-explore:active {
+  outline: none;
+}
