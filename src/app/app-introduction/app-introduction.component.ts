@@ -11,6 +11,6 @@ export class AppIntroductionComponent implements OnInit {
 
   ngOnInit(): void {}
   navigateToLogin() {
-    this.router.navigate(['auth']);
+    this.router.navigate(['groups-view']);
   }
 }
