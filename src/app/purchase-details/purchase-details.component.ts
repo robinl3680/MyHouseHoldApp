@@ -64,7 +64,7 @@ export class PurchaseDetailsComponent implements OnInit {
 
       this.itemService.deleteEntryFromNode(groupId, transactionId)
       .subscribe((data) => {
-        console.log(data);
+        // console.log(data);
         this.onFetchData();
       });
 

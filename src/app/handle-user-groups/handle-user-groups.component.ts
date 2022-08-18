@@ -168,8 +168,8 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.groupService.joinGroupUsingNode(groupId)
       .subscribe((group) => {
         if(group) {
-          console.log(group);
-          this.alert = "You successfully joined to the new group!!";
+          // console.log(group);
+          this.alert = 'You successfully joined to the new group!!';
           this.error = null;
         }
       }, err => {

@@ -72,9 +72,9 @@ export class PurchaseFormComponent implements OnInit {
       this.personService.fetchPersonDetailsFromNode(this.groupName)
         .subscribe((response: { message: string, members: Person[]}) => {
           this.persons = response.members;
-          console.log(this.persons);
+          // console.log(this.persons);
           this.setMultiSelectCheckBoxInfo();
-      });
+        });
        
       this.onFetchData();
     });
@@ -184,7 +184,7 @@ export class PurchaseFormComponent implements OnInit {
           this.resetForm();
           this.isSuccess = true;
         }
-        console.log(response);
+        // console.log(response);
       }), (errorMessage: string) => {
         this.purchaseService.setError(errorMessage);
       };

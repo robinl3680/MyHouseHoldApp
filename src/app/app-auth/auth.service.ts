@@ -173,7 +173,7 @@ export class AuthService {
             phone: phone,
             name: userName
         }).pipe(tap((result) => {
-            console.log(result);
+          // console.log(result);
         }), catchError((err) => {
             return this.handleError(err, this.errorSub);
         }));
@@ -228,7 +228,7 @@ export class AuthService {
     }
 
     public handleAuthenticationNode(responseData) {
-        console.log(responseData);
+        // console.log(responseData);
         const user = new UserModel(responseData.token, responseData.email);
         this.currentUser = user;
         this.verifiedUser.next(true);

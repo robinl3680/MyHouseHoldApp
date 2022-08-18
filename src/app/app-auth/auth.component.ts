@@ -90,7 +90,7 @@ export class AuthComponent implements OnInit {
         this.router.navigate(['phone-auth']);
     }
     validatePassword(form: NgForm) {
-        console.log(form);
+      // console.log(form);
     }
 
 }

@@ -18,8 +18,8 @@ export class AppComponent implements OnInit {
    this.title = 'MyHouseHoldApp';
    this.authService.autoLogin();
    this.groupService.autoLoadGroupId();
-   this.store.select(DummyState.getData).subscribe((d) => 
-    console.log(d)
-   );
+   //  this.store.select(DummyState.getData).subscribe((d) =>
+   //   console.log(d)
+   //  );
  }
 }
