@@ -301,25 +301,30 @@
         <form #itemForm="ngForm"*ngIf="activeSection === 'itemManagementMode'" (ngSubmit)="addItems(itemForm)">
             <div class="form-group">
                 <div class="row">
-                    <div class="col col-md-4">
-                        <label for="item">Item name</label>
-                    </div>
-                    <div class="col col-md-8">
-                        <input class="form-control" type="text" name="item" id="item" ngModel>
+                    <div class="col col-md-12">
+                        <p class="headline__u">Add items to a group</p>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col col-md-4">
-                        <label for="group-id">Group name</label>
+                    <div class="col col-md-6">
+                        <label for="item" class="font__light">Item name</label>
                     </div>
-                    <div class="col col-md-8">
+                    <div class="col col-md-6">
+                        <input class="form-control" type="text" name="item" id="item" ngModel>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col col-md-6">
+                        <label for="group-id" class="font__light">Group name</label>
+                    </div>
+                    <div class="col col-md-6">
                         <select class="form-control" name="group-id" [ngModel]="groupList[0].key">
                             <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col col-md-4">
+                    <div class="col col-md-6">
                     </div>
                     <div class="btn btn-toolbar">
                         <button type="submit" class="btn btn-primary" [disabled]="itemForm.invalid">Add</button>
@@ -330,10 +335,15 @@
         </form>
         <form *ngIf="activeSection === 'itemManagementMode'" #updateOrDeleteItem="ngForm">
             <div class="row">
-                <div class="col col-md-4">
-                    <label for="group-id">Group name</label>
+                <div class="col col-md-12">
+                    <p class="headline__u">Update or Delete items of a group</p>
                 </div>
-                <div class="col col-md-8">
+            </div>
+            <div class="row">
+                <div class="col col-md-6">
+                    <label for="group-id" class="font__light">Group name</label>
+                </div>
+                <div class="col col-md-6">
                     <select class="form-control" name="group-id" ngModel
                         (ngModelChange)="onModelChangeForUpdateDeleteItem(updateOrDeleteItem)">
                         <option *ngFor="let group of groupList" [value]="group.key"> {{group.groupName}} </option>
@@ -341,8 +351,7 @@
                 </div>
             </div>
             <div class="row" style="margin-top: 1rem;">
-                <div class="col col-md-4"></div>
-                <div class="col col-md-8">
+                <div class="col col-md-12">
                     <ul class="list-group" *ngIf="loadItems && items.length > 0">
                         <li class="list-group-item" *ngFor="let item of items; let i = index">
                             <input #itemData class="form-control" type="text" name="itemName" [value]="item" id="itemName">

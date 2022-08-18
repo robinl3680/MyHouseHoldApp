@@ -25,6 +25,12 @@
 }
 .form-container {
     margin-left: 1rem;
-    /* width: 35%; */
+    width: 40%;
 }
-
+.headline__u {
+    text-decoration: underline;
+    font-weight: bold;
+}
+.font__light {
+    font-weight: normal;
+}
