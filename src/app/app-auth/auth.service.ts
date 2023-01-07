@@ -166,17 +166,22 @@ export class AuthService {
         //     tap(this.handleSignUp.bind(this))).subscribe();
 
             
-        return this.http.post('https://house-hold-app.herokuapp.com/auth/signup', {
+        return this.http
+          .post('https://householdapp-server.onrender.com/auth/signup', {
             email: email,
             password: password,
             confirmPassword: confirmPassword,
             phone: phone,
-            name: userName
-        }).pipe(tap((result) => {
-          // console.log(result);
-        }), catchError((err) => {
-            return this.handleError(err, this.errorSub);
-        }));
+            name: userName,
+          })
+          .pipe(
+            tap((result) => {
+              // console.log(result);
+            }),
+            catchError((err) => {
+              return this.handleError(err, this.errorSub);
+            })
+          );
 
     }
 
@@ -215,16 +220,18 @@ export class AuthService {
         //     tap(this.handleAuthentication.bind(this))).subscribe();
 
 
-        this.http.post('https://house-hold-app.herokuapp.com/auth/login', {
+        this.http
+          .post('https://householdapp-server.onrender.com/auth/login', {
             email: email,
-            password: password
-        })
-        .pipe(
-            tap(this.handleAuthenticationNode.bind(this)), 
+            password: password,
+          })
+          .pipe(
+            tap(this.handleAuthenticationNode.bind(this)),
             catchError((err) => {
-                return this.handleError(err, this.errorSub);
-            }))
-        .subscribe();
+              return this.handleError(err, this.errorSub);
+            })
+          )
+          .subscribe();
     }
 
     public handleAuthenticationNode(responseData) {

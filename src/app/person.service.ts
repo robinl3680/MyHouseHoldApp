@@ -28,7 +28,9 @@ export class PersonService {
     }
 
     fetchPersonDetailsFromNode(groupId: string) {
-        return this.http.get(`https://house-hold-app.herokuapp.com/groups/getMembers/${groupId}`);
+        return this.http.get(
+          `https://householdapp-server.onrender.com/groups/getMembers/${groupId}`
+        );
     }
     
 }

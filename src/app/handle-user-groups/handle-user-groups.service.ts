@@ -59,9 +59,12 @@ export class UserGroupService implements OnDestroy {
         //         return this.authService.handleError(errorResponse, this.authService.errorSub);
         //     }));
 
-        return this.http.post('https://house-hold-app.herokuapp.com/groups/create', {
-            name: groupName
-        });
+        return this.http.post(
+          'https://householdapp-server.onrender.com/groups/create',
+          {
+            name: groupName,
+          }
+        );
     }
 
     addGroupToUserProfile(groupId: string, groupName: string) {
@@ -110,13 +113,17 @@ export class UserGroupService implements OnDestroy {
 
 
     fetchGroupFromNode() {
-        return this.http.get('https://house-hold-app.herokuapp.com/groups/getAll')
-            .pipe(
-                tap(this.handleUserGroupsFromNode.bind(this)),
-                catchError(err => {
-                    return this.authService.handleError(err, this.authService.errorSub);
-                })
-            );
+        return this.http
+          .get('https://householdapp-server.onrender.com/groups/getAll')
+          .pipe(
+            tap(this.handleUserGroupsFromNode.bind(this)),
+            catchError((err) => {
+              return this.authService.handleError(
+                err,
+                this.authService.errorSub
+              );
+            })
+          );
     }
 
     handleUserGroupsFromNode(groupDetails) {
@@ -192,15 +199,19 @@ export class UserGroupService implements OnDestroy {
         // }))
 
 
-        return this.http.post('https://house-hold-app.herokuapp.com/groups/addItem', {
+        return this.http
+          .post('https://householdapp-server.onrender.com/groups/addItem', {
             groupId: groupId,
-            item: item
-        })
-            .pipe(
-                catchError(err => {
-                    return this.authService.handleError(err, this.authService.errorSub);
-                })
-            );
+            item: item,
+          })
+          .pipe(
+            catchError((err) => {
+              return this.authService.handleError(
+                err,
+                this.authService.errorSub
+              );
+            })
+          );
 
     }
 
@@ -269,13 +280,18 @@ export class UserGroupService implements OnDestroy {
 
 
     deleteGroupFromNode(groupId: string) {
-        return this.http.delete(`https://house-hold-app.herokuapp.com/groups/delete/${groupId}`);
+        return this.http.delete(
+          `https://householdapp-server.onrender.com/groups/delete/${groupId}`
+        );
     }
 
     leaveGroupFromNode(groupId: string) {
-        return this.http.post('https://house-hold-app.herokuapp.com/groups/leave', {
-            groupId: groupId
-        });
+        return this.http.post(
+          'https://householdapp-server.onrender.com/groups/leave',
+          {
+            groupId: groupId,
+          }
+        );
     }
 
     modifyGroupNameFromUser(groupId: string, groupName: string) {
@@ -332,20 +348,27 @@ export class UserGroupService implements OnDestroy {
     }
 
     updateGroupNameFromNode(groupId: string, name: string) {
-        this.http.post('https://house-hold-app.herokuapp.com/groups/modifyName', {
+        this.http
+          .post('https://householdapp-server.onrender.com/groups/modifyName', {
             groupId: groupId,
-            newName: name
-        }).subscribe();
+            newName: name,
+          })
+          .subscribe();
     }
 
     joinGroupUsingNode(groupId: string) {
-        return this.http.post('https://house-hold-app.herokuapp.com/groups/join', {
-            groupId: groupId
-        }).pipe(
-            catchError(err => {
-                return this.authService.handleError(err, this.authService.errorSub);
+        return this.http
+          .post('https://householdapp-server.onrender.com/groups/join', {
+            groupId: groupId,
+          })
+          .pipe(
+            catchError((err) => {
+              return this.authService.handleError(
+                err,
+                this.authService.errorSub
+              );
             })
-        );
+          );
     }
 
     setCurrentGroupId(groupName: string) {
