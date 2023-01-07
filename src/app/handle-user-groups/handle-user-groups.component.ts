@@ -124,6 +124,7 @@ export class HandleUserGroupsComponent implements OnInit, OnDestroy {
       this.groupService.createNewGroup(groupName).subscribe((response: any) => {
         this.uniqueId = response.group['_id'];
         this.groupNames.push(groupName);
+        this.fetchAllGroups();
         this.error = null;
       });
 
